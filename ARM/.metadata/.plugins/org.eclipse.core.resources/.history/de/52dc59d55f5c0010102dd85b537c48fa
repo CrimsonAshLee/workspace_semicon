@@ -1,0 +1,4 @@
+../Core/Src/motor.c:13:6:Motor_Forward	1
+../Core/Src/motor.c:22:6:Motor_Backward	1
+../Core/Src/motor.c:57:6:Set_Motor_PWM	1
+../Core/Src/motor.c:73:6:Motor_Stop	1

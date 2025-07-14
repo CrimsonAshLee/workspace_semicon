@@ -1,0 +1,12 @@
+../Core/Src/freertos.c:78:1:__io_putchar	16	static
+../Core/Src/freertos.c:158:6:HAL_UART_RxCpltCallback	16	static
+../Core/Src/freertos.c:204:6:HAL_TIM_IC_CaptureCallback	16	static
+../Core/Src/freertos.c:294:6:HCSR04_TRIG_C	8	static
+../Core/Src/freertos.c:303:6:HCSR04_TRIG_L	8	static
+../Core/Src/freertos.c:312:6:HCSR04_TRIG_R	8	static
+../Core/Src/freertos.c:336:6:MX_FREERTOS_Init	8	static
+../Core/Src/freertos.c:393:6:L_MOTOR_TASK01	16	static
+../Core/Src/freertos.c:414:6:R_MOTOR_TASK01	16	static
+../Core/Src/freertos.c:433:6:CENTER_SONIC01	16	static
+../Core/Src/freertos.c:453:6:LEFT_SONIC01	16	static
+../Core/Src/freertos.c:473:6:RIGHT_SONIC01	16	static

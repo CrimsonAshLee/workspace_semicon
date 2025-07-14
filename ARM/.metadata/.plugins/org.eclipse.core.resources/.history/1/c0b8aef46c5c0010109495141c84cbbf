@@ -1,0 +1,9 @@
+../Core/Src/motor.c:12:6:motorSpeed	3
+../Core/Src/motor.c:29:6:motorInit	1
+../Core/Src/motor.c:39:6:forwardMoveFast	1
+../Core/Src/motor.c:49:6:forwardMoveNormal	1
+../Core/Src/motor.c:59:6:forwardMoveSlow	1
+../Core/Src/motor.c:69:6:backwordMove	1
+../Core/Src/motor.c:79:6:stopMove	1
+../Core/Src/motor.c:89:6:rightMove	1
+../Core/Src/motor.c:99:6:leftMove	1

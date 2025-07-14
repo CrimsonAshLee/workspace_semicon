@@ -1,0 +1,26 @@
+/*
+ * ultrasonic.h
+ *
+ *  Created on: Jul 6, 2025
+ *      Author: user8
+ */
+
+
+#ifndef __ULTRASONIC_H
+#define __ULTRASONIC_H
+
+#include "main.h"
+#include "tim.h"
+#include "delay_us.h"
+
+extern uint8_t distance;
+
+//void HCSR04_TRIG(void);
+// TRIG 함수 (센서 각각)
+void HCSR04_TRIG_CENTER(void);
+void HCSR04_TRIG_LEFT(void);
+void HCSR04_TRIG_RIGHT(void);
+
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
+
+#endif

@@ -1,0 +1,49 @@
+# 공통
+*~
+*.bak
+*.tmp
+*.swp
+*.log
+
+# C Language
+*.o
+*.obj
+*.exe
+*.out
+*.bin
+*.a
+*.so
+Debug/
+Release/
+
+# AVR ATmega128A
+*.hex
+*.elf
+*.lss
+*.lst
+*.map
+*.atsuo
+*.suo
+*.user
+
+# STM32
+*.hex
+*.bin
+*.elf
+*.map
+*.lst
+.settings/
+
+# Vivado
+*.jou
+*.str
+*.backup
+.Xil/
+*.vivado*
+*.runs/
+*.cache/
+*.sim/
+*.ip_user_files/
+*.opt_design*
+*.place*
+*.route*

@@ -1,0 +1,15 @@
+/*
+ * ultrasonic.c
+ *
+ *  Created on: Jul 6, 2025
+ *      Author: user8
+ */
+
+
+#include "ultrasonic.h"
+
+uint16_t IC_Value1 = 0;
+uint16_t IC_Value2 = 0;
+uint16_t echoTime = 0;
+uint8_t captureFlag = 0;
+uint8_t distance = 0;

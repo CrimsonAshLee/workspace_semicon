@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "atmega128a"
+		},
+		{
+			"path": "../clang"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"ap.h": "c",
+			"button.h": "c"
+		}
+	}
+}
