@@ -1,4 +1,0 @@
-../Core/Src/freertos.c:78:6:HAL_UART_RxCpltCallback	7
-../Core/Src/freertos.c:136:6:MX_FREERTOS_Init	1
-../Core/Src/freertos.c:184:6:L_MOTOR_TASK01	1
-../Core/Src/freertos.c:205:6:R_MOTOR_TASK01	1
