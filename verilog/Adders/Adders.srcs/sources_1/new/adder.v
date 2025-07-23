@@ -96,81 +96,111 @@ module half_adder_dataflow (
 endmodule
 
 
-// N bit half adder
-module half_adder_N_bit # (parameter N = 8)(        // N의 기본값 8bit를 의미
-    input inc,                                      // 더할 값 (보통은 1, 또는 0)
-    input [N-1:0] load_data,                        // 입력 데이터 (N bit)
-    output [N-1:0]  sum                             // 출력 합계 결과 (N bit)
-);
+// // N bit half adder
+// module half_adder_N_bit # (parameter N = 8)(        // N의 기본값 8bit를 의미
+//     input inc,                                      // 더할 값 (보통은 1, 또는 0)
+//     input [N-1:0] load_data,                        // 입력 데이터 (N bit)
+//     output [N-1:0]  sum                             // 출력 합계 결과 (N bit)
+// );
 
-    wire [N-1:0] carry_out;                         // 각 자리의 carry 출력을 저장할 배열
+//     wire [N-1:0] carry_out;                         // 각 자리의 carry 출력을 저장할 배열
 
-    half_adder_dataflow ha0(                        // 첫번째 비트(LSB)는 inc와 load_data[0]을
-        .a(inc),                                    // 하프에더로 연산
-        .b(load_data[0]),
-        .s(sum[0]),
-        .c(carry_out[0])
-    );
+//     half_adder_dataflow ha0(                        // 첫번째 비트(LSB)는 inc와 load_data[0]을
+//         .a(inc),                                    // 하프에더로 연산
+//         .b(load_data[0]),
+//         .s(sum[0]),
+//         .c(carry_out[0])
+//     );
 
-    genvar i;                                       // generate문을 위한 변수 선언
-    generate
-        for (i = 1; i < N; i = i + 1) begin : hagen // Label을 "hagen"으로 블록 지정
-            half_adder_dataflow ha(
-                .a(carry_out[i - 1]),               // 이전 자리의 캐리 입력
-                .b(load_data[i]),                   // 현재 자리의 입력 비트
-                .s(sum[i]),                         // 현재 자리의 합 출력
-                .c(carry_out[i])                    // 다음 자리로 전달될 케릭 출력
-            );
-        end
-    endgenerate
+//     genvar i;                                       // generate문을 위한 변수 선언
+//     generate
+//         for (i = 1; i < N; i = i + 1) begin : hagen // Label을 "hagen"으로 블록 지정
+//             half_adder_dataflow ha(
+//                 .a(carry_out[i - 1]),               // 이전 자리의 캐리 입력
+//                 .b(load_data[i]),                   // 현재 자리의 입력 비트
+//                 .s(sum[i]),                         // 현재 자리의 합 출력
+//                 .c(carry_out[i])                    // 다음 자리로 전달될 케릭 출력
+//             );
+//         end
+//     endgenerate
     
-endmodule
+// endmodule
 
 
+// N bit half adder
 module half_adder_N_bit # (parameter N = 8)(    
 // # (parameter N = 8)은 이 모듈이 'N'이라는 파라미터를 가지며
 // N의 기본값은 8비트임을 의미합니다. 모듈 인스턴스화 시 N을 변경할 수 있음
                                              
-    input inc,                                      // 1비트 입력 신호를 선언 
-                                                    // (보통은 1 또는 0을 더하는 값으로 사용될 의도인 듯)
+    input inc,                                      
+    // 1비트 입력 신호를 선언 
+    // (보통은 1 또는 0을 더하는 값으로 사용)
+    // increment (증가)의 줄임말
+    // 가산기를 만들 때 특정 값을 입력 데이터에 더하는 경우가 많음
 
-    input [N-1:0] load_data,                        // load_data 라는 N비트 입력 신호를 선언 (주요 피연산자)
+    input [N-1:0] load_data,                        
+    // load_data 라는 N비트 입력 신호를 선언 (주요 피연산자)
 
-    output [N-1:0]  sum                             // sum 이라는 N비트 출력 신호를 선언 (덧셈 결과)
+    output [N-1:0]  sum                             
+    // sum 이라는 N비트 출력 신호를 선언 (덧셈 결과)
 );
 
-    wire [N-1:0] carry_out;                         // 'carry_out'이라는 N비트 와이어 배열을 선언
-                                                    // 각 비트는 해당 자리의 캐리(자리올림) 출력을 저장할 용도
+    wire [N-1:0] carry_out;                         
+    // 'carry_out'이라는 N비트 와이어 배열을 선언
+    // 각 비트는 해당 자리의 캐리(자리올림) 출력을 저장할 용도
 
     // 첫 번째 비트(LSB)를 처리하는 Half Adder를 인스턴스화합니다. (0번째 인덱스)
     // 인스턴스 이름은 'ha0'입니다.
     half_adder_dataflow ha0(
-        .a(inc),                                    // 'ha0'의 첫 번째 입력 'a'에 모듈의 'inc'를 연결합니다.
-                                                    // 즉, 'inc'가 최하위 비트의 덧셈에 직접 참여합니다.
-        .b(load_data[0]),                              // 오류 가능성: 'ha0'의 두 번째 입력 'b'에 N비트 전체 'load_data'를 연결했습니다.
-                                                    // Half Adder는 1비트 입력 2개를 받는데, N비트 'load_data' 전체가 연결되면 문제가 발생합니다.
-                                                    // 의도: .b(load_data[0]) 이어야 합니다.
-        .s(sum[0]),                                 // 'ha0'의 합(sum) 출력 's'를 'sum' 배열의 최하위 비트 'sum[0]'에 연결합니다.
-        .c(carry_out[0])                            // 'ha0'의 캐리(carry) 출력 'c'를 'carry_out' 배열의 첫 번째 비트 'carry_out[0]'에 연결합니다.
+        .a(inc),                                    
+        // 'ha0'의 첫 번째 입력 'a'에 모듈의 'inc'를 연결
+        // 즉 최하위 비트 (LSB)는 inc와 load_data[0]을
+        // 하프에더로 연산
+
+        .b(load_data[0]),                           
+                                                    
+        .s(sum[0]),                                 
+        // 'ha0'의 합(sum) 출력 's'를 'sum' 배열의 최하위 비트 'sum[0]'에 연결합니다.
+
+        .c(carry_out[0])                            
+        // 'ha0'의 캐리(carry) 출력 'c'를 'carry_out' 배열의 첫 번째 비트 'carry_out[0]'에 연결
     );
 
-    genvar i;                                       // generate 문을 사용하기 위한 정수형 변수 'i'를 선언
+    genvar i;                                       
+    // generate 문을 사용하기 위한 정수형 변수 'i'를 선언
 
-    generate                                        // generate 블록을 시작 (반복적으로 하드웨어 인스턴스를 생성할 때 사용)
-        for (i = 1; i < N; i = i + 1) begin : hagen // for 루프를 사용하여 'i'가 1부터 N-1까지 반복되도록 합니다.
-                                                    // 각 반복 블록에는 'hagen'이라는 레이블이 붙습니다 (예: hagen[1], hagen[2]...)
-            half_adder_dataflow ha(                 // 'half_adder_dataflow' 모듈을 인스턴스화합니다. (인스턴스 이름 'ha'는 'hagen[i]'와 결합)
-                .a(carry_out[i - 1]),               // 'ha'의 첫 번째 입력 'a'에 이전 자리의 캐리 출력 'carry_out[i-1]'을 연결합니다.
-                                                    // 이는 전가산기(Full Adder)에서 이전 자리에서 넘어오는 캐리 입력(carry-in)과 유사한 역할을 합니다.
-                .b(load_data[i]),                   // 'ha'의 두 번째 입력 'b'에 'load_data'의 현재 비트 'load_data[i]'를 연결합니다.
-                .s(sum[i]),                         // 'ha'의 합(sum) 출력 's'를 'sum' 배열의 현재 비트 'sum[i]'에 연결합니다.
-                .c(carry_out[i])                    // 'ha'의 캐리(carry) 출력 'c'를 'carry_out' 배열의 현재 비트 'carry_out[i]'에 연결합니다.
-                                                    // 이는 다음 자리로 전달될 캐리 출력입니다.
+    generate                                        
+    // generate 블록을 시작 (반복적으로 하드웨어 인스턴스를 생성할 때 사용)
+
+        for (i = 1; i < N; i = i + 1) begin : hagen 
+        // for 루프를 사용하여 'i'가 1부터 N-1까지 반복
+        // i 는 1부터 ; i 가 N보다 작을 때 까지 실행. 즉 1 가 N-1 까지 실행되고 i = N이 되는 순간 루프 종료;
+        // 루프가 한번 실행될때 마다 i가 +1 씩 증가
+
+        // 각 반복 블록에는 'hagen'이라는 label이 붙습니다 (예: hagen[1], hagen[2]...)
+            
+            half_adder_dataflow ha(                 
+            // 'half_adder_dataflow' 모듈을 인스턴스화 (인스턴스 이름 'ha'는 'hagen[i]'와 결합)
+                
+                .a(carry_out[i - 1]),               
+                // 'ha'의 첫 번째 입력 'a'에 이전 자리의 캐리 출력 'carry_out[i-1]'을 연결
+                // 이는 전가산기(Full Adder)에서 이전 자리에서 넘어오는 캐리 입력(carry-in)과 유사한 역할을 함
+
+
+                .b(load_data[i]),                   
+                // 'ha'의 두 번째 입력 'b'에 'load_data'의 현재 비트 'load_data[i]'를 연결
+
+                .s(sum[i]),                         
+                // 'ha'의 합(sum) 출력 's'를 'sum' 배열의 현재 비트 'sum[i]'에 연결
+
+                .c(carry_out[i])                    
+                // 'ha'의 캐리(carry) 출력 'c'를 'carry_out' 배열의 현재 비트 'carry_out[i]'에 연결
+                // 이는 다음 자리로 전달될 캐리 출력
             );
         end // for 루프 끝
-    endgenerate // generate 블록 끝
+    endgenerate 
     
-endmodule // 모듈 정의 끝
+endmodule
 
 
 // Full-adder

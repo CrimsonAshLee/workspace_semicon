@@ -1,7 +1,0 @@
-../Core/Src/freertos.c:78:1:__io_putchar	2
-../Core/Src/freertos.c:137:6:HAL_UART_RxCpltCallback	7
-../Core/Src/freertos.c:188:6:HAL_TIM_IC_CaptureCallback	16
-../Core/Src/freertos.c:278:6:HCSR04_TRIG	1
-../Core/Src/freertos.c:323:6:MX_FREERTOS_Init	1
-../Core/Src/freertos.c:371:6:MOTOR_TASK01	1
-../Core/Src/freertos.c:389:6:Ultrasonic01	1
