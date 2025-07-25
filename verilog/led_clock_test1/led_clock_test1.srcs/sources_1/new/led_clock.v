@@ -296,7 +296,7 @@ module anode_selector_wdp (
         // 공통 애노드 방식: 0이 세그먼트 ON, 1이 세그먼트 OFF
         // 2번째 FND (scan_count 2'd1)에만 DP (소수점) 표시 (8'b0xxxxxxx)
         case (scan_count) // an_out 대신 scan_count로 직접 조건 검사
-            2'd1: begin // 두 번째 FND (min_tens 자리)에 DP 표시
+            2'd2: begin // 두 번째 FND (min_tens 자리)에 DP 표시
                 case (digit_in)
                     4'd0: seg_out = 8'b0100_0000;   // 0 (dp 켜짐)
                     4'd1: seg_out = 8'b0111_1001;   // 1
