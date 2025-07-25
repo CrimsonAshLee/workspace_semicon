@@ -42,7 +42,7 @@ module clock_divider_10Hz(
     // 0부터 4_999_999까지 카운트 (총 5_000_000 사이클)
     // 100MHz 클럭에서 5_000_000 사이클은 0.05초 (50ms)
     // clk_10Hz가 반전되므로 0.05초마다 반전되어 0.1초 주기의 10Hz 클럭 생성
-    reg [23:0] count;
+    reg [26:0] count;
 
     always @(posedge clk or posedge reset_p) begin
         if (reset_p) begin // reset_p가 활성화되면 카운터와 출력 클럭 초기화
@@ -50,7 +50,7 @@ module clock_divider_10Hz(
             clk_10Hz <= 0;
         end
         else begin
-            if (count == 24'd4_999_999) begin // 카운트가 목표값에 도달하면
+            if (count == 26'd999_999_999) begin // 카운트가 목표값에 도달하면
                 count <= 0;           // 카운터 리셋
                 clk_10Hz <= ~clk_10Hz; // 10Hz 클럭 토글
             end
@@ -347,14 +347,14 @@ module sec_ones_led_driver (
         end else begin
             case (sec_ones_in)
                 4'd1: sec_ones_led_out = 9'b000_000_001; // 1일 때 첫 번째 LED 고 나머지는 끔
-                4'd2: sec_ones_led_out = 9'b000_000_010;
-                4'd3: sec_ones_led_out = 9'b000_000_100;
-                4'd4: sec_ones_led_out = 9'b000_001_000;
-                4'd5: sec_ones_led_out = 9'b000_010_000;
-                4'd6: sec_ones_led_out = 9'b000_100_000;
-                4'd7: sec_ones_led_out = 9'b001_000_000;
-                4'd8: sec_ones_led_out = 9'b010_000_000;
-                4'd9: sec_ones_led_out = 9'b100_000_000; // 9일 때 아홉 번째 LED 고 나머지는 끔
+                4'd2: sec_ones_led_out = 9'b000_000_011;
+                4'd3: sec_ones_led_out = 9'b000_000_111;
+                4'd4: sec_ones_led_out = 9'b000_001_111;
+                4'd5: sec_ones_led_out = 9'b000_011_111;
+                4'd6: sec_ones_led_out = 9'b000_111_111;
+                4'd7: sec_ones_led_out = 9'b001_111_111;
+                4'd8: sec_ones_led_out = 9'b011_111_111;
+                4'd9: sec_ones_led_out = 9'b111_111_111; // 9일 때 아홉 번째 LED 고 나머지는 끔
                 default: sec_ones_led_out = 9'b000_000_000; // 그 외 값은 모두 끔 (안전 장치)
             endcase
         end
@@ -378,10 +378,10 @@ module sec_tens_led_driver (
         end else begin
             case (sec_tens_in)
                 4'd1: sec_tens_led_out = 5'b00001; // 10초일 때 첫 번째 LED 고 나머지는 끔
-                4'd2: sec_tens_led_out = 5'b00010;
-                4'd3: sec_tens_led_out = 5'b00100;
-                4'd4: sec_tens_led_out = 5'b01000;
-                4'd5: sec_tens_led_out = 5'b10000; // 50초일 때 다섯 번째 LED 고 나머지는 끔
+                4'd2: sec_tens_led_out = 5'b00011;
+                4'd3: sec_tens_led_out = 5'b00111;
+                4'd4: sec_tens_led_out = 5'b01111;
+                4'd5: sec_tens_led_out = 5'b11111; // 50초일 때 다섯 번째 LED 고 나머지는 끔
                 default: sec_tens_led_out = 5'b00000; // 그 외 값은 모두 끔 (안전 장치)
             endcase
         end
