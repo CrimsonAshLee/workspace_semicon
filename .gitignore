@@ -47,3 +47,6 @@ Release/
 *.opt_design*
 *.place*
 *.route*
+
+# IDE / Build system files
+.metadata/
