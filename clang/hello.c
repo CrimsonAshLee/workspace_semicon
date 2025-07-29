@@ -9,11 +9,12 @@
 * 여기까지 주석
 */
 
+// ex1)
 // C언어 시작인 메인함수 시작
 // int main()
 // {
 //     char ch; // 문자형 변수 선언
-//     int num; // 정수형 변수 선언
+    // int num; // 정수형 변수 선언
 //     double x; // 실수형 변수 선언
 
 //     int a = 20;
@@ -31,7 +32,7 @@
 // }
 // 
 
-
+// ex2)
     //sizeof() 연산자 -괄호안에 있는것을 바이트크기로 반환
     // int main()
     // {
@@ -86,6 +87,7 @@
     // 변수의 초기화
     // 변수를 선언하고 초기화 하지 않으면 지역변수는 쓰레기값이다.
 
+    // ex3)
     // #include <stdio.h>
     
     // int g; // 전역변수(global variable) : 함수밖에서 선언된 변수
@@ -100,6 +102,8 @@
     //     printf("%d \n", num);
 
     // }
+
+    // ex4)
     // {
     //     int amount = 0;       // 내가 사용 할 변수 3개
     //     int price = 0;
@@ -118,6 +122,7 @@
     //     printf("합계 : %d \n\n\n", totalPrice);
     // }
 
+    // ex5)
     // #include <stdio.h>
 
     // // 산술연산자
@@ -169,6 +174,8 @@
     // || 두개의 값중 하나라도 true일때 true    : OR
     // ! true이면 false, false면 true       : NOT
 
+
+    // ex6)
     // #include <stdio.h>
 
     // int main()
