@@ -257,6 +257,7 @@
     // 반대로 0x38을 2진수로 바꾸면?
     // 3 8을 역산으로 해보면 0011 1000 이된다. 
 
+    // example 7-1)
     // #include <stdio.h> 
 
     // int main()
@@ -279,6 +280,7 @@
     
     // }
 
+  // ex 7-2)
   //   #include <stdio.h>
 
   //   int main()
@@ -342,7 +344,7 @@
 // // 비트 마스크 -> 특정 비트를 조작
 // int main()
 // {
-//     unsigned short data = 0x5678; // 0101 0110 0111 1000 1000
+//     unsigned short data = 0x5678; // 0101 0110 0111 1000
 
 //     unsigned short msk1 = 0xf000; // 1111 0000 0000 0000
 //     unsigned short msk2 = 0x0f00; // 0000 1111 0000 0000
@@ -392,6 +394,7 @@
 
 */
 
+// ex3)
 // #include <stdio.h>
 
 // int main()
@@ -411,6 +414,7 @@
 //     printf("평균은 : %f \n", average); // 평균을 출력함, f는 실수형을 의미함, d는 정수형
 // }
 
+// ex4-1)
 // #include <stdio.h>
 
 // int main()
@@ -445,6 +449,7 @@
 //     }
 // }
 
+// ex4-2)
 // #include <stdio.h>
 
 // int main()
