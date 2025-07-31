@@ -1,0 +1,1 @@
+/home/hongzerry/Tools/avr8/bin/avr-gcc -mmcu=atmega128a -g -flto -fuse-linker-plugin -lm -Wl,-Map=/home/hongzerry/workspace_semicon/My_Practices/AVR_Exercises/atmega128a_exercises/build/atmega128a.map,--cref -Wl,--gc-sections -Xlinker -print-memory-usage CMakeFiles/atmega128a.elf.dir/main.c.obj -o atmega128a.elf 

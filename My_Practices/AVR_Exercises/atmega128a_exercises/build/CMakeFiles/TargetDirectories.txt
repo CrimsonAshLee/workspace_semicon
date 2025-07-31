@@ -1,0 +1,3 @@
+/home/hongzerry/workspace_semicon/My_Practices/AVR_Exercises/atmega128a_exercises/build/CMakeFiles/atmega128a.elf.dir
+/home/hongzerry/workspace_semicon/My_Practices/AVR_Exercises/atmega128a_exercises/build/CMakeFiles/edit_cache.dir
+/home/hongzerry/workspace_semicon/My_Practices/AVR_Exercises/atmega128a_exercises/build/CMakeFiles/rebuild_cache.dir
