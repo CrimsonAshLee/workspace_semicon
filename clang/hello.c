@@ -473,6 +473,7 @@
 //     }
 // }
 
+// ex5)
 // #include <stdio.h>
 // // switch case문
 // int main()
@@ -504,6 +505,8 @@
  
 // }
 
+
+// ex6)
 // #include <stdio.h>
 // //while문 (조건반복문)
 // int main()
@@ -521,6 +524,8 @@
 //     printf("%d 일 운동 했음 \n\n", count);
 // }
 
+
+// ex7-1)
 // #include <stdio.h>
 // // for 문 (반복문) //for(;;) 무한반복문
 // int main()
@@ -559,7 +564,7 @@
 //     }
 // }
 
-
+// ex7-2)
 // #include <stdio.h>
 
 // int main()
@@ -578,6 +583,8 @@
 //     }
 // }
 
+
+// ex 7-3)
 // #include <stdio.h>
 
 // int main()
@@ -595,6 +602,7 @@
 //     }
 // }
 
+// ex7-4)
 // #include <stdio.h>
 
 // int main()
@@ -612,6 +620,7 @@
 //     }
 // }
 
+// ex 7-5)
 // #include <stdio.h>
 // // 별찍기 위아래 통합
 // int main()
