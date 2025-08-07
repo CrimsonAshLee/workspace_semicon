@@ -674,6 +674,7 @@ void sum(x, y)
 }
 */
 
+// ex8-1))
 // #include <stdio.h>
 
 // int printHello() ;
@@ -694,6 +695,7 @@ void sum(x, y)
 //     return 0;
 // }
 
+// ex 8-2)
 // #include <stdio.h>
 
 // int add(int a, int b); // 함수의 원형
@@ -732,8 +734,9 @@ void sum(x, y)
 - 프로그램이 실행될 때 메모리 확보
 */
 
-// #include <stdio.h>            // 함수의 원형 선언
-
+// ex 9-1)
+// #include <stdio.h> 
+// void local(void);
 // int main()
 // {
 //     int i = 5;       // local variable
@@ -804,6 +807,8 @@ void sum(x, y)
 - 초기화하지 않아도 자동으로 0으로 초기화
 */
 
+
+// ex 9-3)
 // #include <stdio.h>
 
 // void local();     // 함수의 원형 선언

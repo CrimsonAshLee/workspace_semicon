@@ -1415,3 +1415,197 @@ void sum(x, y)
 // {
 //     return x + y;
 // }
+
+
+// // Example 8-1)
+// #include <stdio.h> // 표준 입출력 함수(printf)를 사용하기 위해 헤더 파일 포함
+
+// int printHello(); // ⭐ 함수 선언 (Function Declaration)
+//                   // 컴파일러에게 'printHello'라는 함수가 존재하고
+//                   // 반환 타입은 int이며 매개변수는 없다고 미리 알려주는것
+
+// int main() // 프로그램의 시작점인 main 함수
+// {
+//   printf("함수를 호출 합니다\n"); 
+//   printHello(); // ⭐ 함수 호출 (Function Call)
+//                 // 'printHello' 함수를 실행
+
+//   printf("함수를 한번 더 호출 합니다\n"); 
+//   printHello(); // 'printHello' 함수를 다시 한 번 실행
+  
+//   return 0; // main 함수 종료
+// }
+
+// int printHello() // ⭐ 함수 정의 (Function Definition)
+// {
+//   printf("Hello World\n"); // "Hello World"를 화면에 출력하는 실행 코드
+//   return 0; // 함수가 성공적으로 완료되었음을 나타내는 0을 반환
+// }
+
+
+// // Example 8-2)
+// #include <stdio.h>
+
+// int add (int a, int b); // ⭐ 함수 선언(Function Declaration)
+//                         // 컴파일러에게 'add'라는 함수가 존재하고
+//                         // int형 매개변수 2개를 받아 int형 값을 반환한다고 미리 알려준다
+
+// int main()
+// {
+//   int x, y, z;
+//   printf("정수 2개를 입력하시오 : \n");
+//   scanf("%d %d", &x, &y); // 사용자가 입력한 2개의 정수 값을 x와 y 변수에 각각 저장
+
+//   z = add(x, y); // ⭐ 함수 호출(Function Call)
+//                  // add 함수를 호출하며 x와 y의 값을 전달
+//                  // add 함수가 반환하는 값을 z에 저장
+//   printf("%d\n", z); // z에 저장된 값을 출력
+  
+//   return 0; // main 함수 종료
+// }
+
+// int add(int a, int b) // ⭐ 함수 정의(Function Definition)
+// {
+//   int sum; // 함수 내부에서 사용할 정수형 변수 sum을 선언
+//   sum = a + b; // 매개변수 a와 b를 더한 결과를 sum에 저장
+//   printf("두 수의 합은 : %d \n", sum); // 함수 내부에서 합계(sum)를 출력
+//   return sum;  // ⭐ 함수의 실행을 마치고 sum을 반환
+// }
+
+
+/*
+* 변수의 유효범위
+- 지역변수
+- 전역변수
+- 정적변수
+*/
+
+// 지역변수
+/*
+- 블록 {} 내에서 선언된 변수
+- 블록 내에서만 유효, 블록이 종료되면 메모리에서 사라짐
+- 메모리 영역내의 stack(스택)영역에 저장, 초기화하지 않으면 쓰레기값
+- 함수의 매개변수도 함수내에서는 지역변수로 취급
+- 프로그램이 실행될 때 메모리 확보
+*/
+
+
+// // Example 9-1)
+// #include <stdio.h> 
+
+// void local(void);   // 함수 선언: local이라는 함수가 존재하고
+//                     // 반환 값은 없으며(void), 매개변수도 없다고(void) 미리 알림
+
+// int main()          
+// {
+//   int i = 5;        // main 함수 내에서만 사용 가능한 지역 변수 'i'를 선언하고 5로 초기화
+//   int var = 10;     // main 함수 내에서만 사용 가능한 지역 변수 'var'를 선언하고 10으로 초기화
+
+//   printf("main() 함수내의 지역변수 var의 값 : %d \n", var); // main 함수의 var 값(10) 출력
+
+//   if (i < 10)       // i가 10보다 작으므로 조건이 참
+//   {
+//     local();        // ocal() 함수를 호출하여 실행
+//     int var = 30;   // if문 블록 내에서만 사용 가능한 새로운 지역 변수 'var'를 선언하고 30으로 초기화
+//                     // 이 var=30은 main 함수의 var=10과 이름만 같을 뿐 완전히 다른 변수임
+//     printf("if문 내의 지역변수 var의 값 : %d \n", var); // if문 내의 var 값(30) 출력
+//   }
+//   printf("현재 지역변수 var의 값 : %d \n", var); // if문 블록이 끝났으므로, main 함수의 var 값(10) 출력
+// }
+
+// void local(void)    // 함수 정의: local함수의 실제 코드가 구현된 부분
+// {
+//   int var = 20;     // local() 함수 내에서만 사용 가능한 지역 변수 'var'를 선언하고 20으로 초기화
+//                     // 이 변수도 위 두 var와 이름만 같을 뿐 완전히 다른 변수임
+//   printf("local() 함수내의 지역변수 var의 값 : %d \n", var); // local() 함수의 var 값(20) 출력
+// }
+
+
+/*
+* 정적변수
+- static 키워드로 선언된 변수 ex) static int a;
+- 전역변수와 지역변수의 특징을 모두 가지고 있다
+- 함수내에서 선언된 정적변수는 단 한번만 초기화 가능
+  프로그램이 종료될때까지 메모리에 남아있음(프로그램이 종료되어야 메모리에서 삭제됨)
+  위에서 처럼 선언된 정적변수는 지역변수처럼 해당 함수(블록)에서만 접근 가능
+- 전역변수처럼 초기화하지 않으면 0으로 초기화됨
+*/
+
+
+// // Example 9-2)
+// #include <stdio.h>
+
+// void local();      // 'local' 함수가 존재함을 선언
+// void staticVar();  // 'staticVar' 함수가 존재함을 선언
+
+// int main()         
+// {
+//   int i;
+//   for (i = 0; i < 3; i++) // i를 0부터 2까지 3번 반복하는 for문
+//   {
+//     local();           // local() 함수 호출
+//     staticVar();       // staticVar() 함수 호출
+//   }
+// }
+
+// void local()       // local() 함수 정의
+// {
+//   int count = 1;   // 지역 변수 'count'를 선언하고 1로 초기화
+//                    // 이 변수는 함수가 호출될 때마다 새로 만들어짐
+//   printf("local() 함수가 %d 번째 호출되었다 \n", count);
+//   count++;         // count 값을 1 증가시킴 (하지만 함수 종료와 함께 사라짐)
+// }
+
+// void staticVar()   // staticVar() 함수 정의
+// {
+//   static int staticCount = 1; // 정적 변수 'staticCount'를 선언하고 1로 초기화
+//                                // 이 변수는 프로그램 실행 중 단 한 번만 초기화됨
+//   printf("staticVar() 함수가 %d 번째 호출되었다 \n", staticCount);
+//   staticCount++;   // staticCount 값을 1 증가시킴 (함수 종료 후에도 값이 유지됨)
+// }
+
+
+/*
+* 전역변수
+- 전역변수란??? >>> 함수의 외부에 선언된 변수(main)
+- 프로그램의 어디에서나 접근이 가능, 프로그램이 종료되어야 메모리에서 삭제
+- data 영역에 저장, 컴파일 할 때 메모리 확보
+- 초기화하지 않아도 자동으로 0으로 초기화
+*/
+
+
+// Example 9-3)
+#include <stdio.h> 
+
+void local();      // 'local' 함수가 존재함을 선언
+
+int var;           // 전역 변수 'var'를 선언. 함수 밖(main 위)에 선언되어
+                   // 프로그램의 어디에서나 접근 가능. 초기화하지 않아도 자동으로 0으로 초기화됨
+
+int main()         
+{
+  printf("전역변수 var값 : %d \n", var); // 전역 변수 var의 초기값(0)을 출력. 전역변수 var에 접근 가능
+  var++;                                // 전역 변수 var의 값을 1 증가시킴 (var = 1). 전역변수 var에 접근가능
+  int var = 10;                         // main 함수 내에서만 유효한 지역 변수 'var'를 선언하고 10으로 초기화
+                                        // 이 시점부터 main 함수에서는 전역 변수 var에 접근할 수 없게 됨
+  printf("main() 함수내에서의 지역변수 var 값 : %d \n", var); // main 함수의 지역 변수 var 값(10)을 출력
+
+  if (1)                                // 조건이 항상 참(true)이므로 if문 안으로 들어감
+  {
+    local();                            // local() 함수 호출
+    printf("현재 변수 var의 값 : %d \n", var); // if문 내에서 main의 지역 변수 var(10)에 접근.
+                                            // 전역 변수가 아닌 main의 지역 변수 값을 출력.
+  }
+  // printf("더 이상 main() 함수에서는 전역변수 var에 접근 불가 !!!\n");
+  // '더 이상' 이란 표현이 틀린말. 일시적으로 접근 가능했던 부분이 있기때문.
+
+  printf("이 시점부터 main 함수 내에서는 지역 변수 var가 전역 변수를 가려서 전역 변수 var에 접근할 수 없습니다.\n");
+  return 0;                                 
+}
+
+void local()       // local() 함수 정의
+{
+  int var = 20;    // local 함수 내에서만 유효한 지역 변수 'var'를 선언하고 20으로 초기화
+                   // 전역 변수 var와는 다른, 완전히 새로운 변수
+  printf("local() 함수내에서 접근한 지역변수 var의 값은? : %d \n", var); // local 함수의 지역 변수 var 값(20)을 출력
+}
