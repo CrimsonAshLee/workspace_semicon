@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename resource &apos;Project_TaskVer_VEHICLE3/Project_TaskVer_VEHICLE2.ioc&apos; to &apos;Project_TaskVer_VEHICLE3.ioc&apos;" description="Rename resource &apos;Project_TaskVer_VEHICLE2.ioc&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Project_TaskVer_VEHICLE2.ioc" name="Project_TaskVer_VEHICLE3.ioc" stamp="1752028365176" updateReferences="true"/>
-</session>
