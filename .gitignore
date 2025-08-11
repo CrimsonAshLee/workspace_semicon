@@ -5,7 +5,13 @@
 *.swp
 *.log
 
-# C Language
+# IDE / Build system files
+.metadata/
+.DS_Store
+Thumbs.db
+build/
+
+# C / C++ Language
 *.o
 *.obj
 *.exe
@@ -48,5 +54,11 @@ Release/
 *.place*
 *.route*
 
-# IDE / Build system files
-.metadata/
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+
+# VS Code
+.vscode/
