@@ -13,6 +13,9 @@
 			"-DCMAKE_MAKE_PROGRAM=/usr/bin/make"
 		],
 		"cmake.generator": "Unix Makefiles",
-		"cmake.exportCompileCommandsFile": false
+		"cmake.exportCompileCommandsFile": false,
+		"files.associations": {
+			"io.h": "c"
+		}
 	}
 }
