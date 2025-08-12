@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 08/11/2025 02:29:56 PM
+// Create Date: 08/12/2025 06:37:21 PM
 // Design Name: 
-// Module Name: controller
+// Module Name: prof_controller
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -25,39 +25,36 @@ module fnd_cntr(
     input [15:0] fnd_value,
     input hex_bcd,
     output [7:0] seg_7,
-    output [3:0] com
-    );
-
+    output [3:0] com);
+    
     wire [15:0] bcd_value;
     bin_to_dec bcd(.bin(fnd_value[11:0]), .bcd(sec_bcd));
-
+    
     reg [16:0] clk_div;
     always @(posedge clk)clk_div = clk_div + 1;
-
+    
     anode_selector ring_com(
         .scan_count(clk_div[16:15]), .an_out(com));
-    reg [3:0] digit_value;
+    reg [3:0] digit_value; 
     wire [15:0] out_value;
-    assign out_value = hex_bcd ? fnd_value : bcd_value;
-    always @(posedge clk or posedge reset_p) begin
+    assign out_value = hex_bcd ? fnd_value : bcd_value;   
+    always @(posedge clk or posedge reset_p)begin
         if(reset_p)begin
             digit_value = 0;
         end
         else begin
-            case (com)
-                4'b1110 : digit_value = fnd_value[3:0];
-                4'b1101 : digit_value = fnd_value[7:4];
-                4'b1011 : digit_value = fnd_value[11:8];
-                4'b0111 : digit_value = fnd_value[15:12];
-                
+            case(com)
+                4'b1110 : digit_value = out_value[3:0];
+                4'b1101 : digit_value = out_value[7:4];
+                4'b1011 : digit_value = out_value[11:8];
+                4'b0111 : digit_value = out_value[15:12];
             endcase
         end
     end
-    seg_decoder dec(.digit_in(digit_value), .seg_out(seg_7)
-    );
-
+    seg_decoder dec(.digit_in(digit_value), .seg_out(seg_7));
+    
+    
 endmodule
-
 
 module debounce (
     input clk,
@@ -83,23 +80,5 @@ module debounce (
                 btn_out <= btn_sync_1;
         end
     end
-
-endmodule
-
-module btn_cntr (
-    input clk, reset_p,
-    input btn,
-    output btn_pedge, btn_nedge
-);
-    debounce btn_0(
-        .clk(clk), 
-        .btn_in(btn), 
-        .btn_out(debounce_btn)
-        );
-
-    edge_detector_p btn_ed(
-        .clk(clk), .reset_p(reset_p), .cp(debounce_btn),
-        .p_edge(btn_pedge), .n_edge(btn_nedge)
-    );
 
 endmodule
