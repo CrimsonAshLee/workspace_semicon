@@ -5,6 +5,12 @@
 		},
 		{
 			"path": "../../avr/atmega128a"
+		},
+		{
+			"path": "../Verilog_Exercises"
+		},
+		{
+			"path": "../../verilog"
 		}
 	],
 	"settings": {

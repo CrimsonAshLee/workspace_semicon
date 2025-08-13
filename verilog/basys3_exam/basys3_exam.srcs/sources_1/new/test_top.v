@@ -944,3 +944,216 @@ module triple_clock (
     assign buzzer = buzzer_reg;
     
 endmodule
+
+
+module trinity_clock_top(
+    input clk, reset_p,
+    input [3:0] btn,
+    
+    output reg [7:0] seg_7,
+    output reg [3:0] com,
+    output reg [15:0] led,
+    output reg alarm
+);
+
+    
+    wire btn_mode;
+    btn_cntr mode_btn(
+        .clk(clk), 
+        .reset_p(reset_p),
+        .btn(btn[3]), 
+        .btn_pedge(btn_mode)
+    );
+
+    reg [1:0] mode = 2'b00;
+    always @(posedge clk, posedge reset_p) begin
+        if(reset_p) begin
+    
+        end
+        else if(btn_mode) begin
+            case(mode)
+                2'b00: mode = 2'b01;    // watch -> cook_timer
+                2'b01: mode = 2'b10;    // cook_timer -> stop_watch
+                2'b10: mode = 2'b00;    // stop_watch -> watch
+                default: mode = 2'b00; 
+            endcase
+        end
+    end
+    
+    wire [7:0] watch_seg_7;
+    wire [3:0] watch_com;
+    wire [15:0] watch_led;
+    
+    watch_top watch_top_mode(
+        .clk(clk),
+        .reset_p(reset_p),
+        .btn(btn[2:0]),  
+        .seg_7(watch_seg_7),
+        .com(watch_com),
+        .led(watch_led)
+    );
+    
+    wire [7:0] cook_timer_seg_7;
+    wire [3:0] cook_timer_com;
+    wire [15:0] cook_timer_led;
+    wire cook_timer_alarm;
+    
+    cook_timer cook_timer_mode(
+        .clk(clk),
+        .reset_p(reset_p),
+        .btn(btn[3:0]),  
+        .seg_7(cook_timer_seg_7),
+        .com(cook_timer_com),
+        .alarm(cook_timer_alarm),
+        .led(cook_timer_led)
+    );
+    
+    wire [7:0] stop_watch_seg_7;
+    wire [3:0] stop_watch_com;
+    wire [15:0] stop_watch_led;
+    
+    stop_watch stop_watch_mode(
+        .clk(clk),
+        .reset_p(reset_p),
+        .btn(btn[2:0]),  
+        .seg_7(stop_watch_seg_7),
+        .com(stop_watch_com),
+        .led(stop_watch_led)
+    );
+
+    always @(*) begin
+        case(mode)
+            2'b00: begin  // watch
+                seg_7 = watch_seg_7;
+                com = watch_com;
+                led = watch_led;
+                alarm = 0;
+            end
+            2'b01: begin  // cook_timer
+                seg_7 = cook_timer_seg_7;
+                com = cook_timer_com;
+                led = cook_timer_led;
+                alarm = cook_timer_alarm;
+            end
+            2'b10: begin  // stop_watch
+                seg_7 = stop_watch_seg_7;
+                com = stop_watch_com;
+                led = stop_watch_led;
+                alarm = 0;
+            end
+            default: begin
+                seg_7 = 0;
+                com = 0;
+                led = 0;    
+                alarm = 0;  
+            end
+        endcase
+    end
+endmodule
+
+
+module homework_watch_top (
+    input clk,            // 100MHz 시스템 클럭
+    input reset_p,        // 리셋 버튼 (액티브 하이)
+    input btn_mode,       // 모드 변경 버튼
+    input btn_func,       // 기능 제어 버튼 (시작, 정지 등)
+    output [7:0] seg_7,   // 7-세그먼트 세그먼트 출력
+    output [3:0] com,     // 7-세그먼트 공통 단자 (자리 선택)
+    output buzzer         // 부저 출력
+);
+    //========================================================
+    // 1. 내부 신호 선언
+    //========================================================
+    reg [1:0] mode_reg;   // 현재 모드를 저장하는 2비트 레지스터 (00: Watch, 01: Cook Timer, 10: Stopwatch)
+    wire btn_mode_pedge;  // 모드 버튼의 상승 엣지 감지 신호
+    wire btn_func_pedge;  // 기능 버튼의 상승 엣지 감지 신호
+
+    // 각 모듈의 버튼 입력 신호 (Demux)
+    wire btn_watch;
+    wire btn_cook_timer;
+    wire btn_stop_watch;
+    
+    // 각 모듈의 출력 신호
+    wire [15:0] fnd_value_watch;
+    wire [15:0] fnd_value_cook_timer;
+    wire [15:0] fnd_value_stop_watch;
+    wire buzzer_cook_timer;
+    
+    // FND 컨트롤러 입력
+    wire [15:0] fnd_value_final;
+    
+    //========================================================
+    // 2. 클럭 분주기 및 엣지 감지
+    //========================================================
+    // 버튼 엣지 감지 모듈
+    edge_detector_p btn_mode_edge (.clk(clk), .reset_p(reset_p), .cp(btn_mode), .p_edge(btn_mode_pedge), .n_edge());
+    edge_detector_p btn_func_edge (.clk(clk), .reset_p(reset_p), .cp(btn_func), .p_edge(btn_func_pedge), .n_edge());
+
+    //========================================================
+    // 3. 모드 전환 및 버튼 분배 (Demux) 로직
+    //========================================================
+    // 모드 전환
+    always @(posedge clk or posedge reset_p) begin
+        if (reset_p) begin
+            mode_reg <= 2'b00;
+        end else if (btn_mode_pedge) begin
+            case(mode_reg)
+                2'b00: mode_reg <= 2'b01; // Watch -> Cook Timer
+                2'b01: mode_reg <= 2'b10; // Cook Timer -> Stopwatch
+                2'b10: mode_reg <= 2'b00; // Stopwatch -> Watch
+            endcase
+        end
+    end
+    
+    // 버튼 분배 (Demux)
+    assign btn_watch      = (mode_reg == 2'b00) ? btn_func_pedge : 1'b0;
+    assign btn_cook_timer = (mode_reg == 2'b01) ? btn_func_pedge : 1'b0;
+    assign btn_stop_watch = (mode_reg == 2'b10) ? btn_func_pedge : 1'b0;
+    
+    //========================================================
+    // 4. 모듈 인스턴스화
+    //========================================================
+    // watch 모듈 인스턴스
+    watch_top watch_inst (
+        .clk(clk),
+        .reset_p(reset_p),
+        .btn_func(btn_watch),
+        .fnd_value(fnd_value_watch)
+    );
+    
+    // cook_timer 모듈 인스턴스
+    cook_timer cook_timer_inst (
+        .clk(clk),
+        .reset_p(reset_p),
+        .btn_func(btn_cook_timer),
+        .fnd_value(fnd_value_cook_timer),
+        .buzzer(buzzer_cook_timer)
+    );
+
+    // stop_watch 모듈 인스턴스
+    stop_watch stop_watch_inst (
+        .clk(clk),
+        .reset_p(reset_p),
+        .btn_func(btn_stop_watch),
+        .fnd_value(fnd_value_stop_watch)
+    );
+    
+    //========================================================
+    // 5. FND 및 부저 출력 Mux 로직
+    //========================================================
+    // `mode_reg`에 따라 어떤 FND 값을 최종 출력으로 보낼지 결정
+    assign fnd_value_final = (mode_reg == 2'b00) ? fnd_value_watch :
+                             (mode_reg == 2'b01) ? fnd_value_cook_timer :
+                             (mode_reg == 2'b10) ? fnd_value_stop_watch : 16'hFFFF;
+    
+    // 부저 출력 선택
+    assign buzzer = (mode_reg == 2'b01) ? buzzer_cook_timer : 1'b0;
+
+    //========================================================
+    // 6. FND 컨트롤러 연결
+    //========================================================
+    fnd_cntr fnd_inst(
+        .clk(clk), .reset_p(reset_p), .fnd_value(fnd_value_final), .hex_bcd(1'b0), .seg_7(seg_7), .com(com)
+    );
+    
+endmodule
