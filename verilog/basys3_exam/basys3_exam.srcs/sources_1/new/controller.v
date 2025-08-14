@@ -24,12 +24,16 @@ module fnd_cntr(
     input clk, reset_p,
     input [15:0] fnd_value,
     input hex_bcd,
+
     output [7:0] seg_7,
     output [3:0] com
     );
 
     wire [15:0] bcd_value;
-    bin_to_dec bcd(.bin(fnd_value[11:0]), .bcd(sec_bcd));
+    bin_to_dec bcd(
+        .bin(fnd_value[11:0]),
+        .bcd(sec_bcd)
+        );
 
     reg [16:0] clk_div;
     always @(posedge clk)clk_div = clk_div + 1;
@@ -45,10 +49,10 @@ module fnd_cntr(
         end
         else begin
             case (com)
-                4'b1110 : digit_value = fnd_value[3:0];
-                4'b1101 : digit_value = fnd_value[7:4];
-                4'b1011 : digit_value = fnd_value[11:8];
-                4'b0111 : digit_value = fnd_value[15:12];
+                4'b1110 : digit_value = out_value[3:0];
+                4'b1101 : digit_value = out_value[7:4];
+                4'b1011 : digit_value = out_value[11:8];
+                4'b0111 : digit_value = out_value[15:12];
                 
             endcase
         end
@@ -91,6 +95,8 @@ module btn_cntr (
     input btn,
     output btn_pedge, btn_nedge
 );
+    wire debounce_btn;
+
     debounce btn_0(
         .clk(clk), 
         .btn_in(btn), 
@@ -98,8 +104,11 @@ module btn_cntr (
         );
 
     edge_detector_p btn_ed(
-        .clk(clk), .reset_p(reset_p), .cp(debounce_btn),
-        .p_edge(btn_pedge), .n_edge(btn_nedge)
+        .clk(clk), 
+        .reset_p(reset_p), 
+        .cp(debounce_btn),
+        .p_edge(btn_pedge), 
+        .n_edge(btn_nedge)
     );
 
 endmodule
