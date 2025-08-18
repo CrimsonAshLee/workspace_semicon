@@ -362,12 +362,10 @@ module cook_timer (
 );
 
     reg set_flag;
-    reg start_set;
-    reg [7:0] sec, min;
+    reg [7:0] set_sec, set_min;
     reg [26:0] cnt_sysclk = 0;
     wire [15:0] cur_time = {min, sec};
 
-    assign led[0] = start_set;
     always @(posedge clk, posedge reset_p) begin
         if(reset_p) begin
             start_set = 0;
@@ -411,9 +409,13 @@ module cook_timer (
                             min = min - 1;
                         end
                     end
-                    else sec = sec - 1;
+                    else begin
+                        sec = sec - 1;
+                    end 
                 end
-                else cnt_sysclk = cnt_sysclk + 1;
+                else begin
+                    cnt_sysclk = cnt_sysclk + 1;
+                end 
             end
             else begin
                 if (inc_sec) begin
@@ -433,8 +435,8 @@ module cook_timer (
                     end
                 end
                 if (set_flag) begin
-                        sec = set_sec;
-                        min = set_min;
+                    sec = set_sec;
+                    min = set_min;
                 end
             end
         end
@@ -447,7 +449,7 @@ module cook_timer_top (
     input [3:0] btn,
     output [7:0] seg_7,
     output [3:0] com,
-    output reg alarm,
+    output alarm,   // reg안써도됨?
     output [15:0] led   // 디버깅용 led
 );
     wire start_set;
@@ -455,13 +457,9 @@ module cook_timer_top (
     assign led[0] = start_set;
     assign led[15] = alarm;
 
-    reg [7:0] set_sec, set_min;
-    reg start_set;
-    reg [26:0] cnt_sysclk = 0;
-    reg [7:0] sec, min;
+    wire [7:0] sec, min;
 
     wire btn_mode, inc_sec, inc_min, alarm_off;
-    wire [15:0] cur_time = {min, sec};
     wire [7:0] sec_bcd, min_bcd;
 
     btn_cntr mode_btn(
@@ -492,7 +490,7 @@ module cook_timer_top (
         .btn_pedge(alarm_off)
     );
     
-    cook_timer (
+    cook_timer cook_timer_instance(
     .clk(clk), 
     .reset_p(reset_p),
     .btn_mode(btn_mode),
@@ -524,8 +522,6 @@ module stop_watch (
     output reg lap, start_stop
 );
     
-    reg start_stop;
-    assign led[0] = start_stop; // 디버깅용
     always @(posedge clk, posedge reset_p) begin
         if (reset_p) begin
             start_stop = 0;
@@ -538,9 +534,9 @@ module stop_watch (
         end
     end
 
-    reg lap;
-    assign led[1] = lap; // 디버깅용
+    reg [7:0] sec, csec;
     reg [7:0] lap_sec, lap_csec;
+
     always @(posedge clk, posedge reset_p) begin
         if (reset_p) begin
             lap = 0;
@@ -594,9 +590,9 @@ module stop_watch (
             end
         end
     end
-    
+    assign fnd_sec = lap ? lap_sec : sec;
+    assign fnd_csec = lap ? lap_csec : csec;
 endmodule
-
 
 module stop_watch_top (
     input clk, 
@@ -609,8 +605,11 @@ module stop_watch_top (
 );
 
     wire btn_start, btn_lap, btn_clear;
-    reg [7:0]  sec, csec;
-    wire [7:0] sec_bcd, csec_bcd;
+    wire [7:0] fnd_sec, fnd_csec;
+    wire lap, start_stop;
+
+    assign led[0] = start_stop;
+    assign led[1] = lap;
 
     btn_cntr start_btn(
         .clk(clk), 
@@ -633,87 +632,35 @@ module stop_watch_top (
         .btn_pedge(btn_clear)
     );
 
-    reg start_stop;
-    assign led[0] = start_stop; // 디버깅용
-    always @(posedge clk, posedge reset_p) begin
-        if (reset_p) begin
-            start_stop = 0;
-        end
-        else if (btn_start) begin // 플립플롭?
-            start_stop = ~start_stop;
-        end
-        else if (btn_clear) begin
-            start_stop = 0;
-        end
-    end
-
-    reg lap;
-    assign led[1] = lap; // 디버깅용
-    reg [7:0] lap_sec, lap_csec;
-    always @(posedge clk, posedge reset_p) begin
-        if (reset_p) begin
-            lap = 0;
-            lap_sec = 0;
-            lap_csec = 0;
-        end
-        else if (btn_lap) begin // 플립플롭?
-            lap = ~lap;
-            lap_sec = sec;
-            lap_csec = csec;
-        end
-        else if (btn_clear) begin
-            lap = 0;
-            lap_sec = 0;
-            lap_csec = 0;
-        end
-    end
-
-    reg [26:0] cnt_sysclk; // = 0; // reg타입일때 =0은 시뮬레이션 할때 0 준것
-    always @(posedge clk, posedge reset_p) begin
-        if (reset_p) begin
-            sec = 0;
-            csec = 0;
-            cnt_sysclk = 0;
-        end
-        else begin
-            if (start_stop) begin
-                if (cnt_sysclk >= 999_999) begin // 이숫자가 왜 100분의 1초이고 왜 이숫자씀?
-                    cnt_sysclk = 0;
-                    if (csec >= 99) begin
-                        csec = 0;
-                        if (sec >= 99) begin // 스탑워치니까 99까지만한다
-                            sec = 0;
-                        end
-                        else begin
-                            sec = sec + 1;
-                        end
-                    end
-                    else begin
-                        csec = csec + 1;
-                    end
-                end
-                else begin
-                    cnt_sysclk = cnt_sysclk + 1;
-                end
-            end
-            if (btn_clear) begin
-                sec = 0;
-                csec = 0;
-                cnt_sysclk = 0;
-            end
-        end
-    end
+    stop_watch stop_watch_instance(
+        .clk(clk),
+        .reset_p(reset_p),
+        .btn_start(btn_start),
+        .btn_lap(btn_lap),
+        .btn_clear(btn_clear),
+        .lap(lap),
+        .start_stop(start_stop)
+    );
 
     wire [7:0] fnd_sec, fnd_csec;               // 이거 wire, assign문 3줄 왜 쓴거지?
-    assign fnd_sec = lap ? lap_sec :sec;
-    assign fnd_csec = lap ? lap_csec : csec;
 
-    bin_to_dec bcd_sec(.bin(fnd_sec), .bcd(sec_bcd));
-    bin_to_dec bcd_csec(.bin(fnd_csec), .bcd(csec_bcd));
+    bin_to_dec bcd_sec(
+        .bin(fnd_sec), 
+        .bcd(sec_bcd)
+        );
+    bin_to_dec bcd_csec(
+        .bin(fnd_csec), 
+        .bcd(csec_bcd)
+        );
 
-    fnd_cntr fnd(.clk(clk), .reset_p(reset_p),
-    .fnd_value({sec_bcd, csec_bcd}), .hex_bcd(1),  // 이러게해도되는 이유? 상위 비트가 0이라서?
-    .seg_7(seg_7), .com(com));
+    fnd_cntr fnd(
+        .clk(clk), 
+        .reset_p(reset_p),
+        .fnd_value({sec_bcd, csec_bcd}), 
+        .hex_bcd(1),  // 이러게해도되는 이유? 상위 비트가 0이라서?
+        .seg_7(seg_7), 
+        .com(com)
+        );
     
 endmodule
 
@@ -862,63 +809,117 @@ module multifunction_watch_top_v2 (
             end
         end
     end
-
-    reg [2:0] watch_btn, cook_btn, stop_btn;
-    wire [7:0] watch_seg_7, cook_seg_7, stop_seg_7;
-    wire [3:0] watch_com, cook_com, stop_com;
-    always @(*) begin
-        case (mode)
-           WATCH : begin
-            watch_btn = btn[3:1];
-            cook_btn = 0;
-            stop_btn = 0;
-           end
-           COOK_TIMER : begin
-            watch_btn = 0;
-            cook_btn = btn[3:1];
-            stop_btn = 0;
-           end
-           STOP_WATCH : begin
-            watch_btn = 0;
-            cook_btn = 0;
-            stop_btn = btn[3:1];
-           end 
-        endcase
-    end
-
-    watch_top watch(
+    wire [2:0] debounced_btn_pedge;
+    btn_cntr mode_btn1(
         .clk(clk),
         .reset_p(reset_p),
-        .btn(watch_btn),
-        .seg_7(watch_seg_7),
-        .com(watch_com)
+        .btn(btn[1]),
+        .btn_pedge(debounced_btn_pedge[0])
+    );
+    btn_cntr mode_btn2(
+        .clk(clk),
+        .reset_p(reset_p),
+        .btn(btn[2]),
+        .btn_pedge(debounced_btn_pedge[1])
+    );
+    btn_cntr mode_btn3(
+        .clk(clk),
+        .reset_p(reset_p),
+        .btn(btn[3]),
+        .btn_pedge(debounced_btn_pedge[2])
     );
 
+    reg [2:0] watch_btn, cook_btn, stop_btn;
+    always @(*) begin
+        case (mode)
+            WATCH : begin
+                watch_btn = debounced_btn_pedge;
+                cook_btn = 0;
+                stop_btn = 0;
+            end
+            COOK_TIMER : begin
+                watch_btn = 0;
+                cook_btn = debounced_btn_pedge;
+                stop_btn = 0;
+            end
+            STOP_WATCH : begin
+                watch_btn = 0;
+                cook_btn = 0;
+                stop_btn = debounced_btn_pedge;
+            end 
+        endcase
+    end
+    wire [7:0] watch_sec, watch_min, cook_sec, cook_min, stop_sec, stop_csec;
+    wire set_watch;
+    assign led[4] = set_watch;
+    watch watch_instance(
+        .clk(clk),
+        .reset_p(reset_p),
+        .btn_mode(watch_btn[0]),
+        .inc_sec(watch_btn[1]),
+        .inc_min(watch_btn[2]),
+        .sec(watch_sec),
+        .min(watch_min),
+        .set_watch(set_watch)
+    );
+
+    wire start_set;
+    assign led[6] = start_set;
     // wire alarm; 출력으로 만들어야하기 때문에 wire는 부적절
-    cook_timer_top timer(
+    cook_timer_ cook_timer_instance(
         .clk(clk), 
         .reset_p(reset_p),
-        .btn({alarm_off, cook_btn}),
-        .seg_7(cook_seg_7),
-        .com(cook_com),
-        .alarm(alarm)
-    );
+        .btn_mode(cook_btn[0]), 
+        .inc_sec(cook_btn[1]), 
+        .inc_min(cook_btn[2]), 
+        .alarm_off(alarm_off),
+        .sec(cook_sec), 
+        .min(cook_min),
+        .alarm(alarm), 
+        .start_set(start_set)
+        );
 
-    stop_watch_top stop(
+    wire lap, start_stop;
+    assign led[8] = start_stop;
+    assign led[9] = lap;     
+
+    stop_watch stop_watch_instance(
         .clk(clk), 
         .reset_p(reset_p),
-        .btn(stop_btn),
-        .seg_7(stop_seg_7),
-        .com(stop_com)
-    );
+        .btn_start(stop_btn[0]), 
+        .btn_lap(stop_btn[1]), 
+        .btn_clear(stop_btn[2]),
+        .fnd_sec(stop_sec), 
+        .fnd_csec(stop_csec),
+        .lap(lap), 
+        .start_stop(start_stop)
+        );
 
     // fnd출력
-    assign seg_7 = mode == WATCH ? watch_seg_7 : 
-                   mode == COOK_TIMER ? cook_seg_7 :
-                   mode == STOP_WATCH ? stop_seg_7 : watch_seg_7;
-    assign com = mode == WATCH ? watch_com : 
-                 mode == COOK_TIMER ? cook_com :
-                 mode == STOP_WATCH ? stop_com : watch_com;
+    wire [7:0] bin_low, bin_high;
+    wire [7:0] fnd_value_low, fnd_value_high;
+    wire [15:0]fnd_value = {fnd_value_high, fnd_value_low}; 
+    assign bin_low = mode == WATCH ? watch_sec :
+                   mode == COOK_TIMER ? cook_sec :
+                   mode == STOP_WATCH ? stop_csec : watch_sec;             
+    assign bin_high = mode == WATCH ? watch_min :
+                   mode == COOK_TIMER ? cook_min :
+                   mode == STOP_WATCH ? stop_sec : watch_min;
+    
+    bin_to_dec bcd_low(
+        .bin(bin_low), 
+        .bcd(fnd_value_low)
+        );
+    bin_to_dec bcd_high(
+        .bin(bin_high), 
+        .bcd(fnd_value_high)
+        );   
+    fnd_cntr fnd(
+        .clk(clk), 
+        .reset_p(reset_p),
+        .fnd_value(fnd_value),
+        .hex_bcd(1),
+        .seg_7(seg_7), .com(com));
 
 endmodule
 

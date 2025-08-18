@@ -308,3 +308,13 @@ module bin_to_dec(
     end
 endmodule
 
+
+
+
+
+
+
+
+
+
+

@@ -135,10 +135,10 @@ module dht11_cntr (
 
     wire clk_usec_nedge;
     clock_div_100 us_clk(
-    .clk(clk), 
-    .reset_p(reset_p),
-    .nedge_div_100(clk_usec_nedge)
-    );
+        .clk(clk), 
+        .reset_p(reset_p),
+        .nedge_div_100(clk_usec_nedge)
+        );
 
     reg [21:0] count_usec;
     reg count_usec_e;
