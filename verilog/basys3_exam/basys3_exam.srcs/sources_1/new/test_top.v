@@ -500,7 +500,7 @@ module cook_timer_top (
     .inc_min(inc_min),
     .alarm_off(alarm_off),
     .sec(sec),
-    ,min(min)
+    .min(min),
     .alarm(alarm),
     .start_set(start_set)
     );
@@ -920,4 +920,36 @@ module multifunction_watch_top_v2 (
                  mode == COOK_TIMER ? cook_com :
                  mode == STOP_WATCH ? stop_com : watch_com;
 
+endmodule
+
+module dht11_top (
+    input clk, reset_p,
+    inout dht11_data,
+    output [7:0] seg_7,
+    output [3:0] com,
+    output [15:0] led
+);
+    wire [7:0] humidity, temperature;
+
+    dht11_cntr dht11(        
+        clk,
+        reset_p,
+        dht11_data,   
+        humidity, 
+        temperature,
+        led
+        );
+
+    wire [7:0] humi_bcd, tmpr_bcd;
+    bin_to_dec bcd_sec(.bin(humidity), .bcd(humi_bcd));
+    bin_to_dec bcd_csec(.bin(temperature), .bcd(tmpr_bcd));
+
+    fnd_cntr fnd(
+        .clk(clk), 
+        .reset_p(reset_p),
+        .fnd_value({humi_bcd, tmpr_bcd}), 
+        .hex_bcd(1),
+        .seg_7(seg_7), 
+        .com(com));
+    
 endmodule
