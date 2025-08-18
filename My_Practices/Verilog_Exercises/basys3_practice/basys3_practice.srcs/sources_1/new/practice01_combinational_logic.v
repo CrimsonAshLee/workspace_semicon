@@ -60,9 +60,11 @@ module half_adder_behavioral (
     // always 블록은 '항상' 특정 조건이 만족될 때 실행되는 코드 블록
     // @(A, B)는 A 또는 B의 값이 변할 때마다 이 블록을 실행하라는 의미
     always @(A, B) begin
-        // case 문은 주어진 표현식([A, B])의 값에 따라 다른 코드를 실행
+        // case 문은 주어진 표현식({A, B})의 값에 따라 다른 코드를 실행
         // 이는 하드웨어의 '진리표'를 코드로 옮긴 것과 같다.
-        case ({A, B})
+        case ({A, B})   
+        // {} : 연산자의 비트를 묶어줄때 사용
+        // always문의 '='왼쪽 애들은 reg선언이 필수
             // A와 B가 '00'일 때
             2'b00: begin sum = 0; carry = 0; end
             // A와 B가 '01'일 때
@@ -84,8 +86,11 @@ module half_adder_dataflow (
     // wire는 신호를 연결하는 '전선' 역할을 하는 데이터 타입
     // sum_value는 A와 B의 덧셈 결과를 담을 2비트짜리 전선(wire)
     // reg와는 다르게 wire는 저장기능이 없다.
+    // 1 bit 더하기라도 캐리가 발생하면 두자리가 될수있어서 2자리를 선언한것
     wire [1:0] sum_value;
 
+    // dataflow 모델은 assign문 사용. assign문 안에는 수식이 들어감
+    // '='왼쪽에는 wire여야함. (always문이 reg인것과 차이)
     // assign 문은 A와 B를 더해서 그 결과를 sum_value에 연속적으로 할당함
     // 베릴로그에서 '+' 연산자는 덧셈 회로를 의미한다. 단순 덧셈이 아님.
     assign sum_value = A + B;
@@ -97,3 +102,104 @@ module half_adder_dataflow (
     assign carry = sum_value[1];
     
 endmodule
+
+module full_adder_behavioral (  // 3개의 1비트 이진수를 더하는 회로를 설계한 것
+    input A, B, cin,            // A, B는 더할 두 개의 1비트 입력, cin은 아래 자리에서 올라온 올림수(carry-in)
+    output reg sum, carry       // sum은 덧셈 결과의 합(Sum), carry는 다음 자리로 올라갈 올림수(carry-out)
+                                // 중요한 점: always 블록 안에서 값을 할당하므로, 출력 신호를 반드시 reg 타입으로 선언해야 함
+);
+    
+    // always 문은 특정 신호가 변할 때마다 내부 블록을 실행한다.
+    // @(A, B, cin)은 '민감도 리스트(Sensitivity List)'라고 부르는데
+    // 이 리스트에 있는 A, B, cin 중 어느 하나라도 값이 바뀌면 always 블록이 즉시 실행된다.
+    // 이는 조합 논리 회로의 '실시간 반응성'을 모델링하는 방식이다.
+    always @(A, B, cin) begin
+        // case 문은 주어진 표현식의 값에 따라 여러 경우 중 하나를 선택하는 제어문이다
+        // {A, B, cin}은 A, B, cin 세 개의 1비트 신호를 묶어 하나의 3비트짜리 신호로 만든다
+        // 이렇게 묶인 3비트 신호는 2³ = 8가지의 모든 경우의 수를 가질 수 있다.
+        case ({A, B, cin})
+            // 3'b000은 3비트짜리 이진수 000을 의미한다.
+            // 입력 A, B, cin이 모두 0일 때 (0+0+0)의 경우
+            3'b000: begin sum = 0; carry = 0; end
+            
+            // 입력 A, B, cin이 0, 0, 1일 때 (0+0+1)의 경우
+            // 십진수 1은 2진수로 01이므로, sum=1, carry=0이 된다
+            3'b001: begin sum = 1; carry = 0; end
+            
+            // 입력이 0, 1, 0일 때 (0+1+0)의 경우
+            // 십진수 1은 2진수로 01이므로, sum=1, carry=0이 된다.
+            3'b010: begin sum = 1; carry = 0; end
+            
+            // 입력이 0, 1, 1일 때 (0+1+1)의 경우
+            // 십진수 2는 2진수로 10이므로, sum=0, carry=1이 된다
+            3'b011: begin sum = 0; carry = 1; end
+            
+            // 입력이 1, 0, 0일 때 (1+0+0)의 경우
+            // 십진수 1은 2진수로 01이므로, sum=1, carry=0이 된다.
+            3'b100: begin sum = 1; carry = 0; end
+            
+            // 입력이 1, 0, 1일 때 (1+0+1)의 경우
+            // 십진수 2는 2진수로 10이므로, sum=0, carry=1이 된다.
+            3'b101: begin sum = 0; carry = 1; end
+            
+            // 입력이 1, 1, 0일 때 (1+1+0)의 경우
+            // 십진수 2는 2진수로 10이므로, sum=0, carry=1이 된다.
+            3'b110: begin sum = 0; carry = 1; end
+            
+            // 입력이 1, 1, 1일 때 (1+1+1)의 경우
+            // 십진수 3은 2진수로 11이므로, sum=1, carry=1이 된다.
+            3'b111: begin sum = 1; carry = 1; end
+        endcase
+    end
+
+endmodule
+
+module full_adder_structural (
+    input A, B, cin,            
+    output sum, carry           
+    // 중요한 점: 이 코드에서는 항상 값이 실시간으로 연결되므로 
+    // output을 reg가 아닌 wire로 선언해야 함  
+    );
+    
+    // wire는 '내부 연결선' 역할을 하는 신호
+    // sum_0, carry_0, carry_1은 모듈의 최종 출력이 아니라 
+    // 중간 단계의 값을 연결해주는 임시 전선임
+    wire sum_0, carry_0, carry_1;
+
+    // 이전에 만들어두었던 'half_adder_structural'이라는 
+    // 부품을 첫 번째로 불러와서 ha0이라는 이름으로 인스턴스화(instantiation)
+    half_adder_structural ha0(
+        .A(A),                      // ha0 모듈의 내부 입력 포트(.A)에 현재 모듈의 입력 신호(A)를 연결한다
+        .B(B),                      // ha0 모듈의 내부 입력 포트(.B)에 현재 모듈의 입력 신호(B)를 연결한다.
+        .sum(sum_0),                // ha0 모듈의 내부 출력 포트(.sum)를 'sum_0'라는 내부 연결선에 연결한다.
+        .carry(carry_0)             // ha0 모듈의 내부 출력 포트(.carry)를 'carry_0'라는 내부 연결선에 연결한다.
+        );
+
+    // 두 번째 하프 에더 부품을 불러와서 ha1 이라고 인스터화함.
+    // ha1의 입력에는 ha0의 출력 중 sum_0과 현재 모듈의 cin 신호를 연결한다
+    // 이렇게 하면 '중간 합'과 '올림수 입력'을 더할 수 있다.
+    half_adder_structural ha1(
+        .A(sum_0),              // .A(ha1 모듈의 첫 번째 입력) 포트에 (sum_0) 신호를 연결한다.
+                                // sum_0은 ha0 (첫 번째 하프 에더)의 덧셈 결과인 '중간 합'이다.
+                                // 이 중간 합을 ha1의 첫 번째 입력으로 사용하는 것이다.
+                                
+        .B(cin),                // .B(ha1 모듈의 두 번째 입력) 포트에 (cin) 신호를 연결한다.
+                                // cin은 풀 에더 모듈의 가장 처음에 들어온 '아래 자리 올림수' 입력이다.
+                                // 이 입력을 ha1의 두 번째 입력으로 사용하는 것이다.
+                                
+        .sum(sum),              // .sum(ha1 모듈의 합 출력) 포트에, (sum) 신호를 연결한다.
+                                // ha1은 중간 합(sum_0)과 올림수 입력(cin)을 더하므로
+                                // 그 결과는 '최종 합'이 된다.
+                                // 따라서 이 합 결과를 full_adder 모듈 전체의 최종 출력인 'sum'에 직접 연결한다.
+                                
+        .carry(carry_1)         // .carry(ha1 모듈의 올림수 출력) 포트에, (carry_1) 신호를 연결한다.
+                                // ha1의 올림수 출력 역시 최종 올림수를 만드는 데 필요한 '중간 올림수'이다.
+                                // 이 중간 값을 담기 위해 우리는 'carry_1'이라는 새로운 내부 연결선을 만들었다.
+        );
+
+    // 마지막으로 or 게이트를 이용해 두 하프 에더에서 나온 올림수를 합친다.
+    // or (출력, 입력1, 입력2) 형식으로 사용하며, carry_0와 carry_1을 OR 연산하여 최종 carry를 만든다.
+    or (carry, carry_0, carry_1);
+
+endmodule
+
