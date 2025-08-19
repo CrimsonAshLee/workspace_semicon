@@ -300,3 +300,91 @@ module dht11_cntr (
         end
     end
 endmodule
+
+module HC_SR04_fixed(
+    input clk, reset_p,
+    input echo,
+    output reg trigger,
+    output reg [15:0] distance
+    );
+    
+    // FSM 상태 정의
+    localparam H_IDLE = 3'b000;
+    localparam H_TRIG_10US = 3'b001;
+    localparam H_WAIT_ECHO = 3'b010;
+    localparam H_CAL_DISTANCE = 3'b011;
+
+    // FSM 상태 변수 (순차 논리)
+    reg [2:0] state;
+
+    // 카운터 및 기타 변수 (순차 논리)
+    reg [15:0] count_usec;
+    reg [15:0] count_echo_pulse;
+    reg trigger_internal; // 내부용 트리거 신호
+    
+    //-----------------------------------------------------
+    // 상태 업데이트 (순차 논리, 하나의 always 블록)
+    //-----------------------------------------------------
+    always @(posedge clk or posedge reset_p) begin
+        if (reset_p) begin
+            state <= H_IDLE;
+            count_usec <= 0;
+            count_echo_pulse <= 0;
+            trigger <= 0;
+            distance <= 0;
+        end
+        else begin
+            // 상태 전이 로직
+            case(state)
+                H_IDLE: begin
+                    if (count_usec >= 60000) begin // 60ms 대기 (datasheet 권장)
+                        state <= H_TRIG_10US;
+                        count_usec <= 0;
+                    end
+                    else begin
+                        count_usec <= count_usec + 1;
+                    end
+                end
+                
+                H_TRIG_10US: begin
+                    trigger <= 1; // 10us 동안 trigger ON
+                    if (count_usec >= 10) begin
+                        state <= H_WAIT_ECHO;
+                        count_usec <= 0;
+                        trigger <= 0;
+                    end
+                    else begin
+                        count_usec <= count_usec + 1;
+                    end
+                end
+                
+                H_WAIT_ECHO: begin
+                    // 이 부분에 echo 신호에 따른 카운트 및 다음 상태 전이 로직
+                    // echo의 상승/하강 엣지를 감지하여 count_echo_pulse를 시작/중단
+                    // 예: if(echo) count_echo_pulse <= count_echo_pulse + 1;
+                    //     else if (count_echo_pulse > 0) state <= H_CAL_DISTANCE;
+                end
+                
+                H_CAL_DISTANCE: begin
+                    // 거리 계산 및 초기화
+                    distance <= count_echo_pulse / 58;
+                    state <= H_IDLE;
+                end
+            endcase
+        end
+    end
+
+    //-----------------------------------------------------
+    // 보조적인 동기식 논리 (필요한 경우)
+    //-----------------------------------------------------
+    // echo 펄스 길이를 측정하는 로직
+    always @(posedge clk) begin
+        if (state == H_WAIT_ECHO && echo) begin
+            count_echo_pulse <= count_echo_pulse + 1;
+        end
+        else if (state != H_WAIT_ECHO) begin
+            count_echo_pulse <= 0;
+        end
+    end
+    
+endmodule
