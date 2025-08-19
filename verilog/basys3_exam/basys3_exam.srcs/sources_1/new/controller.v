@@ -123,6 +123,7 @@ module dht11_cntr (
     output [15:0] led
     );
     
+    // 이 코드의 핵심 : FSM을 어떻게 쓰는지. 디스코드 캡쳐샷 참고(상태천이도). 링카운터(단순히 돌기만함)와 비교
     localparam S_IDLE      = 6'b00_0001;    // 덧셈기를 만들면 더 낭비된다.
     localparam S_LOW_18MS  = 6'b00_0010;    // 6비트로 하는게 자원소모가 덜 된다.
     localparam S_HIGH_20US = 6'b00_0100;
@@ -222,20 +223,37 @@ module dht11_cntr (
                     //     count_usec_e = 1;
                     // end
                     // else begin
-                        if (dht_nedge) begin
-                            next_state = S_LOW_80US;
-                            count_usec_e = 0;
-                        end
+                    count_usec_e = 1;
+                    if (count_usec > 22'd100_00) begin
+                        count_usec_e = 0;
+                        next_state = S_IDLE;
+                    end
+                    if (dht_nedge) begin
+                        next_state = S_LOW_80US;
+                        count_usec_e = 0;
+                    end
                     //end
                 end
                 S_LOW_80US: begin
+                    count_usec_e = 1;
+                    if (count_usec > 22'd100_00) begin
+                        count_usec_e = 0;
+                        next_state = S_IDLE;
+                    end
                     if (dht_pedge) begin
                         next_state = S_HIGH_80US;
+                        count_usec_e = 0;
                     end
                 end
                 S_HIGH_80US: begin
+                    count_usec_e = 1;
+                    if (count_usec > 22'd100_00) begin
+                        count_usec_e = 0;
+                        next_state = S_IDLE;
+                    end
                     if (dht_nedge) begin
                         next_state = S_READ_DATA;
+                        count_usec_e = 0;
                     end
                 end
                 S_READ_DATA: begin // 데이터시트의 Figure 4 Data "0" Indication
@@ -259,14 +277,22 @@ module dht11_cntr (
                             end
                             else begin
                                 count_usec_e = 1;
+                                if (count_usec > 22'd100_000) begin
+                                    count_usec_e = 0;
+                                    next_state = S_IDLE;
+                                    data_count = 0;
+                                    read_state = S_WAIT_PEDGE;
+                                end
                             end
                         end
                     endcase
                     if (data_count >= 40) begin
                         next_state = S_IDLE;
                         data_count = 0;
-                        humidity = temp_data[39:32];
-                        temperature = temp_data[23:16];
+                        if (temp_data[39:32] + temp_data[31:24] + temp_data[23:16] + temp_data[15:8] == temp_data[7:0]) begin // 추가된 코드 (근데 뭐지?)
+                            humidity = temp_data[39:32];
+                            temperature = temp_data[23:16];
+                        end
                     end
                 end
                 default: next_state = S_IDLE; // 없어도됨
