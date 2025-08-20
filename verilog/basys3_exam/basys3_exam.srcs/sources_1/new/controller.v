@@ -367,7 +367,8 @@ module HC_SR04_fixed(
                 
                 H_CAL_DISTANCE: begin
                     // 거리 계산 및 초기화
-                    distance <= count_echo_pulse / 58;
+                    // distance <= count_echo_pulse / 58; 나누기를 안하려면? 아래문장?
+                    distance <= count_echo_pulse[21:1] / 29;
                     state <= H_IDLE;
                 end
             endcase
@@ -387,4 +388,145 @@ module HC_SR04_fixed(
         end
     end
     
+endmodule
+
+module keypad_cntr (
+    input clk, reset_p,
+    input [3:0] row,
+
+    output reg [3:0] column,
+    output reg [3:0] key_value,
+    output reg key_valid,
+    output reg [15:0] led
+);
+
+    localparam [4:0] SCAN_0       = 5'b00001;
+    localparam [4:0] SCAN_1       = 5'b00010;
+    localparam [4:0] SCAN_2       = 5'b00100;
+    localparam [4:0] SCAN_3       = 5'b01000;
+    localparam [4:0] KEY_PROCESS  = 5'b10000;
+
+    reg [19:0] clk_10ms;    // 15번 비트를 쓰면 더 빠르게 스캔
+    always @(posedge clk) begin
+        clk_10ms = clk_10ms + 1;
+    end
+
+    wire clk_10ms_nedge, clk_10ms_pedge;
+    edge_detector_p ms_10_ed(
+        .clk(clk), 
+        .reset_p(reset_p), 
+        .cp(clk_10ms[19]),
+        .p_edge(clk_10ms_pedge),
+        .n_edge(clk_10ms_nedge)
+    );
+
+    reg [4:0] state, next_state;
+    always @(posedge clk, posedge reset_p) begin    // 플립플롭
+        if (reset_p) begin
+            state = SCAN_0;
+        end
+        else if (clk_10ms_pedge)begin
+            state = next_state;
+        end
+    end
+
+    always @(*) begin       // * : 항상실행. 엣지를 안씀 : 조합회로
+        case (state)
+            SCAN_0      : begin
+                if (row == 0) begin
+                    next_state = SCAN_1;
+                end
+                else begin
+                    next_state = KEY_PROCESS;
+                end
+            end 
+            SCAN_1      : begin
+                if (row == 0) begin
+                    next_state = SCAN_2;
+                end
+                else begin
+                    next_state = KEY_PROCESS;
+                end
+            end 
+            SCAN_2      : begin
+                if (row == 0) begin
+                    next_state = SCAN_3;
+                end
+                else begin
+                    next_state = KEY_PROCESS;
+                end
+            end 
+            SCAN_3      : begin
+                if (row == 0) begin
+                    next_state = SCAN_0;
+                end
+                else begin
+                    next_state = KEY_PROCESS;
+                end
+            end 
+            KEY_PROCESS  : begin    
+                if (row == 0) begin
+                    next_state = SCAN_0;
+                end
+                else begin
+                    next_state = KEY_PROCESS;
+                end
+            end
+            default: next_state = KEY_PROCESS; 
+        endcase
+    end
+
+    always @(posedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            column = 4'b0001;
+            key_value = 0;
+            key_valid = 0;
+        end
+        else if (clk_10ms_nedge)begin
+            case (state)
+                SCAN_0      : begin
+                    column = 4'b0001;
+                    key_valid = 0;
+                end
+
+                SCAN_1      : begin
+                    column = 4'b0010;
+                    key_valid = 0;
+                end
+
+                SCAN_2      : begin
+                    column = 4'b0100;
+                    key_valid = 0;
+                end
+
+                SCAN_3      : begin
+                    column = 4'b1000;
+                    key_valid = 0;
+                end
+
+                KEY_PROCESS : begin
+                    key_valid = 1;
+                    case ({column, row})
+                        8'b0001_0001: key_value = 4'h0;
+                        8'b0001_0010: key_value = 4'h1;
+                        8'b0001_0100: key_value = 4'h2;
+                        8'b0001_1000: key_value = 4'h3; 
+                        8'b0010_0001: key_value = 4'h4;
+                        8'b0010_0010: key_value = 4'h5;
+                        8'b0010_0100: key_value = 4'h6;
+                        8'b0010_1000: key_value = 4'h7;
+                        8'b0100_0001: key_value = 4'h8;
+                        8'b0100_0010: key_value = 4'h9;
+                        8'b0100_0100: key_value = 4'hA;
+                        8'b0100_1000: key_value = 4'hb;
+                        8'b1000_0001: key_value = 4'hC;
+                        8'b1000_0010: key_value = 4'hd;
+                        8'b1000_0100: key_value = 4'hE;
+                        8'b1000_1000: key_value = 4'hF;
+                    endcase
+                end
+            endcase
+        end
+    end
+
 endmodule

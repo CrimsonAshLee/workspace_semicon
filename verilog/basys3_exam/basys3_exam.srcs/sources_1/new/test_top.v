@@ -954,3 +954,68 @@ module dht11_top (
         .com(com));
     
 endmodule
+
+module hc_sr04_top (
+    input clk, reset_p,
+    input echo,
+    output trig,
+    output [7:0] seg_7,
+    output [3:0] com,
+    output [15:0] led
+);
+    wire [11:0] distance_cm;    // 8bit가 맞지만 넉넉하게 12bit(datasheet 권장)
+    HC_SR04_fixed ultra_sonic(
+        clk,
+        reset_p,
+        echo,
+        trig,
+        distance_cm,
+        led
+    );
+    bin_to_dec bcd_dist(.bin(distance_cm), .bcd(distance_cm_bcd));
+    
+    fnd_cntr fnd(
+        .clk(clk), 
+        .reset_p(reset_p),
+        .fnd_value(distance_cm_bcd), 
+        .hex_bcd(1),
+        .seg_7(seg_7), 
+        .com(com));
+    
+endmodule
+
+module keypad_top (
+    input clk, reset_p,
+    input [3:0] row,
+
+    output [3:0] column,
+    output [7:0] seg_7,
+    output [3:0] com,
+    output [15:0] led
+);
+
+    wire [3:0] key_value;
+    wire key_valid;
+    assign led[0] = key_valid;
+
+    keypad_cntr key_pad(
+        clk,
+        reset_p,
+        row,
+        column,
+        key_value,
+        key_valid,
+        led[5:1]
+    );
+
+    fnd_cntr fnd(
+        .clk(clk),
+        .reset_p(reset_p),
+        .fnd_value(key_value),
+        .hex_bcd(1),
+        .seg_7(seg_7),
+        .com(com)
+    );
+    // ila_0 ila(.clk)
+
+endmodule
