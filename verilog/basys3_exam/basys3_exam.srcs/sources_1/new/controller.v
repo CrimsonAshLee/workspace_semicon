@@ -57,9 +57,8 @@ module fnd_cntr(
             endcase
         end
     end
-    seg_decoder dec(.digit_in(digit_value), .seg_out(seg_7)
-    );
-
+    // seg_decoder dec(.digit_in(digit_value), .seg_out(seg_7));    // original
+    calcuator_seg_decoder dec(.digit_in(digit_value), .seg_out(seg_7)); // calculator
 endmodule
 
 
@@ -504,27 +503,382 @@ module keypad_cntr (
                     key_valid = 0;
                 end
 
-                KEY_PROCESS : begin
+                // KEY_PROCESS : begin  // original
+                //     key_valid = 1;
+                //     case ({column, row})
+                //         8'b0001_0001: key_value = 4'h0;
+                //         8'b0001_0010: key_value = 4'h1;
+                //         8'b0001_0100: key_value = 4'h2;
+                //         8'b0001_1000: key_value = 4'h3; 
+                //         8'b0010_0001: key_value = 4'h4;
+                //         8'b0010_0010: key_value = 4'h5;
+                //         8'b0010_0100: key_value = 4'h6;
+                //         8'b0010_1000: key_value = 4'h7;
+                //         8'b0100_0001: key_value = 4'h8;
+                //         8'b0100_0010: key_value = 4'h9;
+                //         8'b0100_0100: key_value = 4'hA;
+                //         8'b0100_1000: key_value = 4'hb;
+                //         8'b1000_0001: key_value = 4'hC;
+                //         8'b1000_0010: key_value = 4'hd;
+                //         8'b1000_0100: key_value = 4'hE;
+                //         8'b1000_1000: key_value = 4'hF;
+                //     endcase
+                // end
+                KEY_PROCESS : begin // calculator
                     key_valid = 1;
                     case ({column, row})
-                        8'b0001_0001: key_value = 4'h0;
-                        8'b0001_0010: key_value = 4'h1;
-                        8'b0001_0100: key_value = 4'h2;
-                        8'b0001_1000: key_value = 4'h3; 
+                        8'b0001_0001: key_value = 4'h7;
+                        8'b0001_0010: key_value = 4'h8;
+                        8'b0001_0100: key_value = 4'h9;
+                        8'b0001_1000: key_value = 4'hA; // +
                         8'b0010_0001: key_value = 4'h4;
                         8'b0010_0010: key_value = 4'h5;
                         8'b0010_0100: key_value = 4'h6;
-                        8'b0010_1000: key_value = 4'h7;
-                        8'b0100_0001: key_value = 4'h8;
-                        8'b0100_0010: key_value = 4'h9;
-                        8'b0100_0100: key_value = 4'hA;
-                        8'b0100_1000: key_value = 4'hb;
+                        8'b0010_1000: key_value = 4'hb; // -
+                        8'b0100_0001: key_value = 4'h1;
+                        8'b0100_0010: key_value = 4'h2;
+                        8'b0100_0100: key_value = 4'h3;
+                        8'b0100_1000: key_value = 4'hE; // *
                         8'b1000_0001: key_value = 4'hC;
-                        8'b1000_0010: key_value = 4'hd;
-                        8'b1000_0100: key_value = 4'hE;
-                        8'b1000_1000: key_value = 4'hF;
+                        8'b1000_0010: key_value = 4'h0;
+                        8'b1000_0100: key_value = 4'hF; // =
+                        8'b1000_1000: key_value = 4'hd; // /
                     endcase
                 end
+                
+            endcase
+        end
+    end
+
+endmodule
+
+module I2C_master (    // IIC가 정식명칭
+// 이 모듈은 100khz 로 i2c 통신
+    input clk, reset_p,
+    input [6:0] addr,   // 데이터 보낼 주소
+    input [7:0] data,
+    input rd_wr, comm_start,
+
+    output reg scl, sda,    // 클럭과 데이터. sda는 사실 inout을 써야하지만 데이터를 보내기만할거라 아웃풋으로함
+    output [15:0] led   // debugging
+);
+    
+    localparam IDLE         = 7'b000_0001;
+    localparam COMM_START   = 7'b000_0010;
+    localparam SEND_ADDR    = 7'b000_0100;
+    localparam RD_ACK       = 7'b000_1000;
+    localparam SEND_DATA    = 7'b001_0000;
+    localparam SCL_STOP     = 7'b010_0000;
+    localparam COMM_STOP    = 7'b100_0000;
+
+    wire clk_usec_nedge;
+    clock_div_100 us_clk(
+        .clk(clk), 
+        .reset_p(reset_p),
+        .nedge_div_100(clk_usec_nedge)
+        );
+
+    wire comm_start, comm_start_pedge;
+    edge_detector_p comm_start_ed(
+        .clk(clk), 
+        .reset_p(reset_p), 
+        .cp(comm_start),
+        .p_edge(comm_start_pedge)
+    );
+
+    wire scl_nedge, scl_pedge;
+    edge_detector_p scl_ed(
+        .clk(clk), 
+        .reset_p(reset_p), 
+        .cp(scl),
+        .p_edge(scl_pedge),
+        .n_edge(scl_nedge)
+    );
+
+    // 5us 마다 토글
+    reg [2:0] count_usec5;
+    reg scl_e;
+    always @(posedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            count_usec5 = 0;
+            scl = 0;
+        end
+        else if(scl_e)begin
+            if (clk_usec_nedge) begin
+                if (count_usec5 >= 4) begin
+                    count_usec5 = 0;
+                    scl = ~scl;
+                end
+                else begin
+                    count_usec5 = count_usec5 + 1;
+                end 
+            end
+        end
+        else if (!scl_e) begin
+            count_usec5 = 0;
+            scl = 1;
+        end
+    end
+
+    reg [6:0] state, next_state;
+    always @(negedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            state = IDLE;
+        end
+        else begin
+            state = next_state;
+        end
+    end
+
+    wire [7:0] addr_rd_wr;
+    assign addr_rd_wr = {addr, rd_wr};
+    reg [2:0] cnt_bit;
+    reg stop_flag;
+
+    always @(posedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            next_state = IDLE;
+            scl_e = 0;
+            sda = 1;
+            cnt_bit = 7;
+            stop_flag = 0;
+        end
+        else begin
+            case (state)
+                IDLE        : begin
+                    scl_e = 0;
+                    sda = 1;
+                    if (comm_start_pedge) begin //통신시작
+                        next_state = COMM_START;
+                    end
+                end
+                COMM_START  : begin
+                    sda = 0;
+                    scl_e = 1;  // scl이 움직이기 시작
+                    next_state = SEND_ADDR;
+                end
+                SEND_ADDR   : begin // 최상위 비트부터 보냄
+                    if (scl_nedge) begin // low상태
+                        sda = addr_rd_wr[cnt_bit];
+                    end
+                    if (scl_pedge) begin
+                        if (cnt_bit == 0) begin
+                            cnt_bit = 7;
+                            next_state = RD_ACK;
+                        end
+                        else begin
+                            cnt_bit = cnt_bit - 1;
+                        end 
+                    end
+                end
+                RD_ACK      : begin
+                    if (scl_nedge) begin
+                        sda = 'bz; // 출력연결을 끊겠다. 임피던스
+                    end
+                    else if (scl_pedge) begin
+                        next_state = SEND_DATA;
+                        if (stop_flag) begin
+                            stop_flag = 0;
+                            next_state = SCL_STOP;
+                        end
+                        else begin
+                            stop_flag = 1;
+                            next_state = SEND_DATA;
+                        end
+                    end    
+                end
+                SEND_DATA   : begin
+                    if (scl_nedge) begin
+                        sda = data[cnt_bit];
+                    end
+                    if (scl_pedge) begin
+                        if (cnt_bit == 0) begin
+                            cnt_bit = 7;
+                            next_state = RD_ACK;
+                        end
+                        else begin
+                            cnt_bit = cnt_bit - 1;
+                        end
+                    end
+                end
+                SCL_STOP    : begin
+                    if (scl_nedge) begin
+                        sda = 0;
+                    end
+                    if (scl_pedge) begin
+                        next_state = COMM_STOP;
+                    end
+                end
+                COMM_STOP   : begin
+                    // 0 에서 1 바로 주면 상승엣지를 바로 못받음
+                    // 따라서 조금 기다려야함
+                    if (count_usec5 >= 3) begin
+                        scl_e = 0;
+                        sda = 1;
+                        next_state = IDLE;
+                    end
+                end
+            endcase
+        end
+    end
+
+endmodule
+
+module i2c_lcd_send_byte (
+    input clk, reset_p,
+    input [6:0] addr,
+    input [7:0] send_buffer,
+    input send, rs,
+
+    output scl, sda,
+    output reg busy,
+    output [15:0] led
+);
+    
+    localparam IDLE                     = 6'b00_0001;
+    localparam SEND_HIGH_NIBBLE_DISABLE = 6'b00_0010;
+    localparam SEND_HIGH_NIBBLE_ENABLE  = 6'b00_0100; // 하위 4비트, ENABLE 1주기
+    localparam SEND_LOW_NIBBLE_DISABLE  = 6'b00_1000;
+    localparam SEND_LOW_NIBBLE_ENABLE   = 6'b01_0000;
+    localparam SEND_DISABLE             = 6'b10_0000;
+
+    // 딜레이를 위한 클락
+    wire clk_usec_nedge;
+    clock_div_100 us_clk(
+        .clk(clk), 
+        .reset_p(reset_p),
+        .nedge_div_100(clk_usec_nedge)
+        );
+    
+    reg [7:0] data;
+    reg comm_start;
+
+    wire send_pedge;
+    edge_detector_p send_ed(
+        .clk(clk), 
+        .reset_p(reset_p), 
+        .cp(send),
+        .p_edge(send_pedge)
+    );
+
+    reg [21:0] count_usec;
+    reg count_usec_e;
+    always @(negedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            count_usec = 0;
+        end
+        else if (clk_usec_nedge && count_usec_e) begin
+            count_usec = count_usec + 1; // enable이 1일때만?
+        end
+        else if (!count_usec_e) begin
+            count_usec = 0; // clear
+        end
+    end
+
+    I2C_master master(    
+        clk, 
+        reset_p,
+        addr,   
+        data, 1'b0,              // 1'b0 이유는?
+        comm_start,
+        scl, sda,   
+    );
+
+    reg [5:0] state, next_state;
+    always @(negedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            state = IDLE;
+        end
+        else begin
+            state = next_state;
+        end
+    end
+
+    always @(posedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            next_state = IDLE;
+            comm_start = 0;
+            count_usec_e = 0;
+            data = 0;
+            busy = 0;
+        end
+        else begin
+            case (state)
+                IDLE                    : begin // send입력
+                    if (send_pedge) begin
+                        next_state = SEND_HIGH_NIBBLE_DISABLE;
+                        busy = 1;   // 통신넘어가는 순간 busy = 1
+                    end
+                end
+                SEND_HIGH_NIBBLE_DISABLE: begin
+                    if (count_usec <= 22'd200) begin    // 통신이 다 될때까지 여유있게 200us 기다리기
+                        // d7 d6 d5 d4      BL en rw rs
+                        data = {send_buffer[7:4], 3'b100, rs};
+                        comm_start = 1;
+                        count_usec_e = 1;
+                    end
+                    else begin
+                        next_state = SEND_HIGH_NIBBLE_ENABLE;
+                        count_usec_e = 0;
+                        comm_start = 0;
+                    end        
+                end
+                SEND_HIGH_NIBBLE_ENABLE : begin
+                     if (count_usec <= 22'd200) begin    // 통신이 다 될때까지 여유있게 200us 기다리기
+                        // d7 d6 d5 d4      BL en rw rs
+                        data = {send_buffer[7:4], 3'b110, rs};
+                        comm_start = 1;
+                        count_usec_e = 1;
+                    end
+                    else begin
+                        next_state = SEND_LOW_NIBBLE_DISABLE;
+                        count_usec_e = 0;
+                        comm_start = 0;
+                    end 
+                end
+                SEND_LOW_NIBBLE_DISABLE : begin
+                     if (count_usec <= 22'd200) begin    // 통신이 다 될때까지 여유있게 200us 기다리기
+                        // d7 d6 d5 d4      BL en rw rs
+                        data = {send_buffer[3:0], 3'b100, rs};
+                        comm_start = 1;
+                        count_usec_e = 1;
+                    end
+                    else begin
+                        next_state = SEND_LOW_NIBBLE_ENABLE;
+                        count_usec_e = 0;
+                        comm_start = 0;
+                    end 
+                    
+                end
+                SEND_LOW_NIBBLE_ENABLE  : begin
+                    if (count_usec <= 22'd200) begin    // 통신이 다 될때까지 여유있게 200us 기다리기
+                        // d7 d6 d5 d4      BL en rw rs
+                        data = {send_buffer[3:0], 3'b110, rs};
+                        comm_start = 1;
+                        count_usec_e = 1;
+                    end
+                    else begin
+                        next_state = SEND_DISABLE;
+                        count_usec_e = 0;
+                        comm_start = 0;
+                    end 
+                    
+                end
+                SEND_DISABLE            : begin
+                    if (count_usec <= 22'd200) begin    // 통신이 다 될때까지 여유있게 200us 기다리기
+                        // d7 d6 d5 d4      BL en rw rs
+                        data = {send_buffer[7:4], 3'b100, rs};
+                        comm_start = 1;
+                        count_usec_e = 1;
+                    end
+                    else begin
+                        next_state = IDLE;
+                        count_usec_e = 0;
+                        comm_start = 0;
+                        busy = 0;   // 통신이 끝나서 busy = 0
+                    end 
+                end
+                
             endcase
         end
     end

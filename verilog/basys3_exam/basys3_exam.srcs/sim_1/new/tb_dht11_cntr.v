@@ -33,7 +33,7 @@ module tb_dht11_cntr();   // tb파일은 입출력이 없다. 내부 와이어�
     // assign humidity = // 8'b0000_0001;
     reg dout, wr_e;   // write enable
     tri1 dht11_data;    // reg, wire, integer외에 나머지변수는 tb에서 사용
-                        // tri1 : 풀업저항이 달린 wire
+                        // tri1 : 풀업저항이 달린 wire 변수로 simulation에서만 사용 가능
     assign dht11_data = wr_e ? dout : 'bz; // 'bz : 몇비트인지 선언이 없다.
                                            // 다 임피던스이다
     
