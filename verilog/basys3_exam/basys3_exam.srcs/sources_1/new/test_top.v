@@ -1016,6 +1016,289 @@ module keypad_top (
         .seg_7(seg_7),
         .com(com)
     );
-    // ila_0 ila(.clk)
 
+endmodule
+
+module i2c_txtlcd_top (
+    input clk, reset_p,
+    input [3:0] btn,
+    input [3:0] row,
+    
+    output [3:0] column,
+    output scl, sda,
+    output [15:0] led
+);
+    
+    wire [3:0] btn_pedge;
+    btn_cntr btn0 (     // 순서대로 연결할땐 .clk~이런거 빼도됨
+        clk, 
+        reset_p,
+        btn[0],
+        btn_pedge[0]
+    );
+    btn_cntr btn1 (     // 순서대로 연결할땐 .clk~이런거 빼도됨
+        clk, 
+        reset_p,
+        btn[1],
+        btn_pedge[1]
+    );
+    btn_cntr btn2 (     // 순서대로 연결할땐 .clk~이런거 빼도됨
+        clk, 
+        reset_p,
+        btn[2],
+        btn_pedge[2]
+    );
+    btn_cntr btn3 (     // 순서대로 연결할땐 .clk~이런거 빼도됨
+        clk, 
+        reset_p,
+        btn[3],
+        btn_pedge[3]
+    );
+
+    integer cnt_sysclk;
+    reg count_clk_e;
+    always @(negedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            cnt_sysclk = 0;
+        end
+        else if (count_clk_e) begin
+            cnt_sysclk = cnt_sysclk + 1;
+        end
+        else begin
+            cnt_sysclk = 0;
+        end
+    end
+
+    reg [7:0] send_buffer;  // 입력은 reg로 받고 always문에서 다루기
+    reg send, rs;
+    wire busy;  // 출력은 와이어로
+    i2c_lcd_send_byte send_byte(
+        clk,
+        reset_p,
+        7'h27,      // ldc 주소
+        send_buffer,
+        send,
+        rs,
+        scl, sda,
+        busy,
+        led
+    );
+
+    wire [3:0] key_value;
+    wire key_valid;
+    keypad_cntr keypad (
+        clk,
+        reset_p,
+        row,
+        column,
+        key_value,
+        key_valid    
+    );
+
+    wire key_valid_pedge;
+    edge_detector_p key_ed (
+        .clk(clk), 
+        .reset_p(reset_p), 
+        .cp(key_valid),
+        .p_edge(key_valid_pedge)
+    );
+
+
+    localparam IDLE                 = 6'b00_0001;
+    localparam INIT                 = 6'b00_0010;   // 초기화 상태
+    localparam SEND_CHARACTER       = 6'b00_0100;   // 한문자 보내기
+    localparam SHIFT_RIGHT_DISPLAY  = 6'b00_1000;
+    localparam SHIFT_LEFT_DISPLAY   = 6'b01_0000;
+    localparam SEND_KEY             = 6'b10_0000;
+
+    reg [5:0] state, next_state;    // 상태머신
+    always @(negedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            state = IDLE;
+        end
+        else begin
+            state = next_state;
+        end
+    end
+
+    // 각 상태에 대해서 정의
+    reg init_flag;  // init은 한번만 하면됨
+    reg [10:0] cnt_data;
+    always @(posedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            next_state = IDLE;
+            init_flag = 0;
+            count_clk_e = 0;
+            send = 0;
+            send_buffer = 0;
+            rs = 0;
+            cnt_data = 0;
+        end
+        else begin
+            case (state)
+                IDLE                :begin
+                    if (init_flag) begin
+                        if (btn_pedge[0]) begin
+                            next_state = SEND_CHARACTER;
+                        end
+                        if (btn_pedge[2]) begin
+                            next_state = SHIFT_RIGHT_DISPLAY;
+                        end
+                        if (btn_pedge[1]) begin
+                            next_state = SHIFT_LEFT_DISPLAY;
+                        end
+                        if (key_valid_pedge) begin  // keypad
+                            next_state = SEND_KEY;
+                        end
+                    end
+                    else begin
+                        if (cnt_sysclk <= 32'd80_000_00) begin   // 데이터시트 기준 40ms 대기지만 넉넉하게 2배주기
+                            count_clk_e = 1;
+                        end
+                        else begin
+                            next_state = INIT;
+                            count_clk_e = 0;
+                        end
+                    end
+                end              
+                INIT                :begin
+                    if (busy) begin // busy가 1이되는건 통신이 시작이 되면이다.끝나고 idle상태이면 0
+                        send = 0;   // 아래 send = 1 이후에 busy가 1이 되어서 여기로옴
+                        if (cnt_data >= 6) begin
+                            cnt_data = 0;
+                            next_state = IDLE;
+                            init_flag = 1;
+                        end
+                    end
+                    else if (!send) begin
+                        case (cnt_data) // datasheet HD44780.pdf
+                           0 :send_buffer = 8'h33;
+                           1 :send_buffer = 8'h32;
+                           2 :send_buffer = 8'h28;
+                           3 :send_buffer = 8'h0c; 
+                           4 :send_buffer = 8'h01;
+                           5 :send_buffer = 8'h06;  
+                        endcase
+                        send = 1;   // 통신이 시작되서 busy가 1이되고 위의 if(busy)로감
+                        cnt_data = cnt_data + 1;
+                    end
+                end
+                SEND_CHARACTER      :begin
+                    if (busy) begin
+                        next_state = IDLE;
+                        send = 0;
+                        if (cnt_data >= 25) begin
+                            cnt_data = 0;
+                        end
+                        else begin
+                            cnt_data = cnt_data + 1;
+                        end
+                    end
+                    else begin
+                        rs = 1;
+                        send_buffer = "a" + cnt_data;  // C언어의 아스키코드와의 차이점?
+                        send = 1;
+                    end
+                end
+                SHIFT_RIGHT_DISPLAY :begin
+                    if (busy) begin
+                        next_state = IDLE;
+                        send = 0;
+                    end
+                    else begin
+                        rs = 0;
+                        send_buffer = 8'h1c;
+                        send = 1;
+                    end
+                end
+                SHIFT_LEFT_DISPLAY  :begin
+                     if (busy) begin
+                        next_state = IDLE;
+                        send = 0;
+                    end
+                    else begin
+                        rs = 0;
+                        send_buffer = 8'h18;
+                        send = 1;
+                    end
+                end
+                SEND_KEY            :begin
+                    if (busy) begin
+                        next_state = IDLE;
+                        send = 0;
+                    end
+                    else begin
+                        rs = 1;
+                        if (key_value < 10) begin
+                            send_buffer = "0" + key_value;  //
+                        end
+                        else if (key_value == 10) begin
+                                send_buffer = "+";
+                        end
+                        else if (key_value == 11) begin
+                                send_buffer = "-";
+                        end
+                        else if (key_value == 12) begin
+                                send_buffer = "C";
+                        end
+                        else if (key_value == 13) begin
+                                send_buffer = "/";
+                        end
+                        else if (key_value == 14) begin
+                                send_buffer = "*";
+                        end
+                        else if (key_value == 15) begin
+                                send_buffer = "=";
+                        end
+                        send = 1;
+                    end
+                end
+
+            endcase
+        end
+    end
+
+endmodule
+
+module led_pwm_top (
+    input clk, reset_p,
+
+    output led_r, led_g, led_b,
+    output [15:0] led
+);
+
+    integer cnt;
+    always @(posedge clk) begin
+        cnt = cnt + 1;                                                                                                                      
+    end
+   
+    // assign led[0] = pwm; // 오실로스코프 파형 체크용
+    // assign JA[0] = pwm; // 오실로스코프로 파형 체크용
+    pwm_led_Nstep #(
+        .duty_step_N(200))
+        pwm_led_r(
+            clk, 
+            reset_p,
+            cnt[27:21],
+            led_r
+            );
+
+    pwm_led_Nstep #(
+        .duty_step_N(100))
+        pwm_led_g(
+            clk, 
+            reset_p,
+            cnt[28:22],
+            led_g
+        );
+
+    pwm_led_Nstep #(
+        .duty_step_N(100))
+        pwm_led_b(
+            clk, 
+            reset_p,
+            cnt[29:23], // duty를 직접준 형태
+            led_b
+        );
+    
 endmodule

@@ -884,3 +884,66 @@ module i2c_lcd_send_byte (
     end
 
 endmodule
+
+module pwm_led_Nstep (
+    input clk, reset_p,
+    input [31:0] duty,   // 0 ~ 127 밝기 조절
+
+    output reg pwm
+);
+    
+    parameter sys_clk_freq = 100_000_000;   
+    parameter pwm_freq = 10_000;    // 1만 정도가 적당함, 모터면 알맞게 조정하기
+    parameter duty_step_N = 200;    // default값
+    parameter temp = sys_clk_freq / pwm_freq / duty_step_N / 2;
+
+    integer cnt;
+    reg pwm_freqXn;
+    always @(posedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            cnt = 0;
+            pwm_freqXn = 0;
+        end
+        else begin
+            if (cnt >= temp - 1) begin
+                cnt = 0;
+                pwm_freqXn = ~pwm_freqXn;
+            end
+            else begin
+                cnt = cnt + 1;
+            end
+        end
+    end
+
+    wire pwm_freqXn_nedge;
+    edge_detector_p pwm_freqXn_ed(
+        .clk(clk), 
+        .reset_p(reset_p), 
+        .cp(pwm_freqXn),
+        .n_edge(pwm_freqXn_nedge)
+    );
+
+    // reg [6:0] cnt_duty; // 128 일때
+    integer cnt_duty;   // 200 일때.
+    always @(posedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            cnt_duty = 0;
+            pwm = 0;
+        end
+        else if (pwm_freqXn_nedge) begin
+            if (cnt_duty >= duty_step_N) begin
+                cnt_duty = 0;
+            end
+            else begin
+                cnt_duty = cnt_duty + 1;
+            end
+            if (cnt_duty < duty) begin // duty(0~127)로 펄스폭 제어,(ex : 5를 주면 5/128)
+                pwm = 1;
+            end
+            else begin
+                pwm = 0;
+            end
+        end
+    end
+
+endmodule
