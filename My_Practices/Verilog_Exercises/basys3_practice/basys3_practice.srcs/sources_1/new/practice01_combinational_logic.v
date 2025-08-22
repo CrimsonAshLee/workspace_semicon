@@ -36,7 +36,9 @@ endmodule
 module half_adder_structural (
     input A, B,         // A, B라는 두 입력 포트를 선언
     output sum, carry   // sum, carry라는 두 출력 포트를 선언
-    );
+    ); 
+    // 여기 이후 부분이 입출력이 어떻게 동작해야되는지 서술하는 부분이다
+    // 구조적 모델링은 게이트를 이용해서 회로를 만든다.
     
     // xor는 미리 정의된 '기본 게이트 프리미티브(Gate Primitive)'이다.
     // (sum, A, B)는 xor 게이트의 출력이 sum에, 입력이 A와 B에 연결됨을 의미
@@ -59,16 +61,19 @@ module half_adder_behavioral (
 
     // always 블록은 '항상' 특정 조건이 만족될 때 실행되는 코드 블록
     // @(A, B)는 A 또는 B의 값이 변할 때마다 이 블록을 실행하라는 의미
+    // sensitivy List
+    // 즉 모든 입력에 대해서 출력이 어떻게 되는지 서술한것
     always @(A, B) begin
         // case 문은 주어진 표현식({A, B})의 값에 따라 다른 코드를 실행
         // 이는 하드웨어의 '진리표'를 코드로 옮긴 것과 같다.
-        case ({A, B})   
-        // {} : 연산자의 비트를 묶어줄때 사용
-        // always문의 '='왼쪽 애들은 reg선언이 필수
+        case ({A, B})   // A, B 입력이 들어올때(그 조합에 따라)라는 뜻   
+        // {} : 연산자의 비트를 묶어줄때 사용. 각각 1비트씩 이므로 2비트
+        // always문의 '='왼쪽에 있는 변수는 reg선언이 필수. 즉, 입력을 받는 변수이다. 
+        // reg 가 아니면 wire이다. wire는 입력값 바뀌면 출력이 즉시 바뀜 -> combinational logic
             // A와 B가 '00'일 때
-            2'b00: begin sum = 0; carry = 0; end
-            // A와 B가 '01'일 때
-            2'b01: begin sum = 1; carry = 0; end
+            2'b00: begin sum = 0; carry = 0; end    // 베릴로그의 수표현 방식
+            // A와 B가 '01'일 때                      // 2: 2bit, b: binary
+            2'b01: begin sum = 1; carry = 0; end    
             // A와 B가 '10'일 때
             2'b10: begin sum = 1; carry = 0; end
             // A와 B가 '11'일 때
