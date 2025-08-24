@@ -83,7 +83,8 @@ module half_adder_behavioral (
     
 endmodule
 
-module half_adder_dataflow (
+module half_adder_dataflow ( // 어떤식으로 처리되서 어떤식으로 흘러가는지
+                             // 데이터의 흐름으로 정리하는 방식
     input A, B,         
     output sum, carry 
     );
@@ -173,11 +174,11 @@ module full_adder_structural (
 
     // 이전에 만들어두었던 'half_adder_structural'이라는 
     // 부품을 첫 번째로 불러와서 ha0이라는 이름으로 인스턴스화(instantiation)
-    half_adder_structural ha0(
+    half_adder_structural ha0(  // 인스턴화된 모듈도 게이트 개념으로 볼 수 있음
         .A(A),                      // ha0 모듈의 내부 입력 포트(.A)에 현재 모듈의 입력 신호(A)를 연결한다
         .B(B),                      // ha0 모듈의 내부 입력 포트(.B)에 현재 모듈의 입력 신호(B)를 연결한다.
-        .sum(sum_0),                // ha0 모듈의 내부 출력 포트(.sum)를 'sum_0'라는 내부 연결선에 연결한다.
-        .carry(carry_0)             // ha0 모듈의 내부 출력 포트(.carry)를 'carry_0'라는 내부 연결선에 연결한다.
+        .sum(sum_0),                // ha0 모듈의 내부 출력 포트(.sum)를 sum_0 라는 wire 에 연결한다.
+        .carry(carry_0)             // ha0 모듈의 내부 출력 포트(.carry)를 carry_0 라는 wire에 연결한다.
         );
 
     // 두 번째 하프 에더 부품을 불러와서 ha1 이라고 인스터화함.
@@ -208,3 +209,39 @@ module full_adder_structural (
 
 endmodule
 
+module full_adder_dataflow (
+    input A, B, cin,     // 입력 핀 3개: A, B, 올림수(cin)
+    output sum, carry    // 출력 핀 2개: 합(sum), 올림(carry)
+);
+    
+    // wire: 전선처럼 동작하는 변수. 값이 바뀌면 즉시 출력으로 연결됨.
+    // [1:0] sum_value: 2비트 크기의 wire 선언
+    //               A+B+cin의 최대값은 1+1+1=3(2진수 '11')이므로 2비트가 필요
+    wire [1:0] sum_value; 
+    
+    // assign: '연속 할당문'. 입력값이 변하면 항상 실시간으로 계산하여 wire에 값을 할당함
+    assign sum_value = A + B + cin;
+    // A, B, cin의 현재 값을 더한 결과를 sum_value라는 전선에 실시간으로 연결함
+    
+    // sum 출력에 sum_value의 가장 낮은 비트([0])를 연결
+    assign sum = sum_value[0];
+    
+    // carry 출력에 sum_value의 가장 높은 비트([1])를 연결
+    assign carry = sum_value[1];
+
+endmodule
+
+module fadder_4bit_dataflow(
+    input [3:0] A, B,   // A 4bit, B 4bit 입력
+    input cin,          // carry 입출력은 1bit
+    output [3:0] sum, 
+    output carry
+    );
+
+    wire [1:0] sum_value;
+    
+    assign sum_value = A + B + cin;
+    assign sum = sum_value[0];
+    assign carry = sum_value[1];
+
+endmodule
