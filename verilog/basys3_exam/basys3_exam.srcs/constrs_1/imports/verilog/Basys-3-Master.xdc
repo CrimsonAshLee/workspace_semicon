@@ -84,7 +84,7 @@ set_property -dict { PACKAGE_PIN G3   IOSTANDARD LVCMOS33 } [get_ports {column[3
 ##Pmod Header JB
 set_property -dict { PACKAGE_PIN A14   IOSTANDARD LVCMOS33 } [get_ports {scl}];#Sch name = JB1
 set_property -dict { PACKAGE_PIN A16   IOSTANDARD LVCMOS33 } [get_ports {sda}];#Sch name = JB2
-#set_property -dict { PACKAGE_PIN B15   IOSTANDARD LVCMOS33 } [get_ports {JB[2]}];#Sch name = JB3
+set_property -dict { PACKAGE_PIN B15   IOSTANDARD LVCMOS33 } [get_ports {sg90}];#Sch name = JB3
 #set_property -dict { PACKAGE_PIN B16   IOSTANDARD LVCMOS33 } [get_ports {JB[3]}];#Sch name = JB4
 #set_property -dict { PACKAGE_PIN A15   IOSTANDARD LVCMOS33 } [get_ports {JB[4]}];#Sch name = JB7
 #set_property -dict { PACKAGE_PIN A17   IOSTANDARD LVCMOS33 } [get_ports {JB[5]}];#Sch name = JB8
@@ -102,12 +102,12 @@ set_property -dict { PACKAGE_PIN N17   IOSTANDARD LVCMOS33 } [get_ports {led_b}]
 #set_property -dict { PACKAGE_PIN R18   IOSTANDARD LVCMOS33 } [get_ports {JC[7]}];#Sch name = JC10
 
 ##Pmod Header JXADC
-#set_property -dict { PACKAGE_PIN J3   IOSTANDARD LVCMOS33 } [get_ports {JXADC[0]}];#Sch name = XA1_P
-#set_property -dict { PACKAGE_PIN L3   IOSTANDARD LVCMOS33 } [get_ports {JXADC[1]}];#Sch name = XA2_P
+set_property -dict { PACKAGE_PIN J3   IOSTANDARD LVCMOS33 } [get_ports {vauxp6}];#Sch name = XA1_P
+set_property -dict { PACKAGE_PIN L3   IOSTANDARD LVCMOS33 } [get_ports {vauxp14}];#Sch name = XA2_P
 #set_property -dict { PACKAGE_PIN M2   IOSTANDARD LVCMOS33 } [get_ports {JXADC[2]}];#Sch name = XA3_P
 #set_property -dict { PACKAGE_PIN N2   IOSTANDARD LVCMOS33 } [get_ports {JXADC[3]}];#Sch name = XA4_P
-#set_property -dict { PACKAGE_PIN K3   IOSTANDARD LVCMOS33 } [get_ports {JXADC[4]}];#Sch name = XA1_N
-#set_property -dict { PACKAGE_PIN M3   IOSTANDARD LVCMOS33 } [get_ports {JXADC[5]}];#Sch name = XA2_N
+set_property -dict { PACKAGE_PIN K3   IOSTANDARD LVCMOS33 } [get_ports {vauxn6}];#Sch name = XA1_N
+set_property -dict { PACKAGE_PIN M3   IOSTANDARD LVCMOS33 } [get_ports {vauxn14}];#Sch name = XA2_N
 #set_property -dict { PACKAGE_PIN M1   IOSTANDARD LVCMOS33 } [get_ports {JXADC[6]}];#Sch name = XA3_N
 #set_property -dict { PACKAGE_PIN N1   IOSTANDARD LVCMOS33 } [get_ports {JXADC[7]}];#Sch name = XA4_N
 

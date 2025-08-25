@@ -32,7 +32,7 @@ module fnd_cntr(
     wire [15:0] bcd_value;
     bin_to_dec bcd(
         .bin(fnd_value[11:0]),
-        .bcd(sec_bcd)
+        .bcd(bcd_value)
         );
 
     reg [16:0] clk_div;
@@ -885,7 +885,7 @@ module i2c_lcd_send_byte (
 
 endmodule
 
-module pwm_led_Nstep (
+module pwm_Nfreq_Nstep (
     input clk, reset_p,
     input [31:0] duty,   // 0 ~ 127 밝기 조절
 

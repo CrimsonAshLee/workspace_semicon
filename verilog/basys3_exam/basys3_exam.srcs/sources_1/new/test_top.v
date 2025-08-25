@@ -1274,7 +1274,7 @@ module led_pwm_top (
    
     // assign led[0] = pwm; // 오실로스코프 파형 체크용
     // assign JA[0] = pwm; // 오실로스코프로 파형 체크용
-    pwm_led_Nstep #(
+    pwm_Nfreq_Nstep #(
         .duty_step_N(200))
         pwm_led_r(
             clk, 
@@ -1283,7 +1283,7 @@ module led_pwm_top (
             led_r
             );
 
-    pwm_led_Nstep #(
+    pwm_Nfreq_Nstep #(
         .duty_step_N(100))
         pwm_led_g(
             clk, 
@@ -1292,7 +1292,7 @@ module led_pwm_top (
             led_g
         );
 
-    pwm_led_Nstep #(
+    pwm_Nfreq_Nstep #(
         .duty_step_N(100))
         pwm_led_b(
             clk, 
@@ -1301,4 +1301,201 @@ module led_pwm_top (
             led_b
         );
     
+endmodule
+
+module sg90_top (
+    input clk, reset_p,
+    output sg90
+);
+
+    integer step, cnt;
+    always @(posedge clk) begin
+        cnt = cnt + 1;                                                                                                                      
+    end
+    wire cnt_pedge;
+    edge_detector_p cnt_ed (
+        .clk(clk), 
+        .reset_p(reset_p), 
+        .cp(cnt[22]),
+        .p_edge(cnt_pedge)
+    );
+
+    reg inc_flag;
+    always @(posedge clk or posedge reset_p) begin
+        if (reset_p) begin
+            step = 8;
+            inc_flag = 1;
+        end
+        else if (cnt_pedge) begin
+            if (inc_flag) begin
+                if (step >= 189) begin
+                    inc_flag = 0;
+                end
+                else begin
+                    step = step + 1;
+                end
+            end
+            else begin
+                if (step <= 18) begin
+                    inc_flag = 1;
+                end
+                else begin
+                    step = step - 1;
+                end
+            end
+        end
+    end
+
+    pwm_Nfreq_Nstep #(
+        .pwm_freq(50),
+        .duty_step_N(1440))
+        pwm_sg90(
+            clk, 
+            reset_p, 
+            step, 
+            sg90
+    );
+
+    
+endmodule
+
+module adc_top_6 (  //  channel 6
+    input clk, reset_p,
+    input vauxp6, vauxn6,
+    output [7:0] seg_7,
+    output [3:0] com,
+    output [15:0] led
+);
+    
+    wire [4:0] channel_out;
+    wire eoc_out;
+    wire [15:0] do_out;
+
+    xadc_wiz_0 adc
+        (
+        .daddr_in({2'b00, channel_out}),            // Address bus for the dynamic reconfiguration port
+        .dclk_in(clk),             // Clock input for the dynamic reconfiguration port
+        .den_in(eoc_out),              // Enable Signal for the dynamic reconfiguration port
+        .reset_in(reset_p),            // Reset signal for the System Monitor control logic
+        .vauxp6(vauxp6),              // Auxiliary channel 6
+        .vauxn6(vauxn6),
+        .channel_out(channel_out),         // Channel Selection Outputs
+        .do_out(do_out),              // Output data bus for dynamic reconfiguration port
+        .eoc_out(eoc_out)             // End of Conversion Signal
+        );
+
+    reg [11:0] adc_value;   // 변환값 저장할 변수
+    wire eoc_pedge;
+    edge_detector_p eoc_ed (
+        .clk(clk), 
+        .reset_p(reset_p), 
+        .cp(eoc_out),
+        .p_edge(eoc_pedge)
+    );
+    always @(posedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            adc_value = 0;
+        end
+        else if (eoc_pedge) begin
+            adc_value = do_out[15:4];   // 정밀도 버리고 값을 안정적이게 볼때 (ex 15:8) 수정
+        end                             // 반대로 정밀도 올리고 값이 덜 안정적(ex 15:4)
+    end
+
+    fnd_cntr fnd(
+        .clk(clk), 
+        .reset_p(reset_p),
+        .fnd_value(adc_value),
+        .hex_bcd(0),
+        .seg_7(seg_7), .com(com));
+
+    assign led[0] = eoc_out;
+    assign led[15:4] = adc_value;
+
+endmodule
+
+module adc_sequence2_top (
+    input clk, reset_p,
+    input vauxp6, vauxn6,
+    input vauxp14, vauxn14,
+    output [7:0] seg_7,
+    output [3:0] com,
+    output [15:0] led,
+    output led_g, led_b
+);
+
+    wire [4:0] channel_out;
+    wire [15:0] do_out;
+    wire eoc_out;
+    xadc_joystick joystick (
+        .daddr_in({2'b00, channel_out}),            // Address bus for the dynamic reconfiguration port
+        .dclk_in(clk),             // Clock input for the dynamic reconfiguration port
+        .den_in(eoc_out),              // Enable Signal for the dynamic reconfiguration port
+        .reset_in(reset_p),            // Reset signal for the System Monitor control logic
+        .vauxp6(vauxp6),              // Auxiliary channel 6
+        .vauxn6(vauxn6),
+        .vauxp14(vauxp14),             // Auxiliary channel 14
+        .vauxn14(vauxn14),
+        .channel_out(channel_out),         // Channel Selection Outputs
+        .do_out(do_out),              // Output data bus for dynamic reconfiguration port
+        .eoc_out(eoc_out)             // End of Conversion Signal
+        );
+
+    reg [11:0] adc_value_x, adc_value_y;   // 변환값 저장할 변수
+    wire eoc_pedge;
+    edge_detector_p eoc_ed (
+        .clk(clk), 
+        .reset_p(reset_p), 
+        .cp(eoc_out),
+        .p_edge(eoc_pedge)
+    );
+    always @(posedge clk, posedge reset_p) begin
+        if (reset_p) begin
+            adc_value_x = 0;
+            adc_value_y = 0;
+        end
+        else if (eoc_pedge) begin
+            case (channel_out[3:0])
+               6 : adc_value_x = do_out[15:4];  // 채널6
+               14: adc_value_y = do_out[15:4];  // 채널 14
+            endcase
+        end                             
+    end
+
+    wire [7:0] x_bcd, y_bcd;
+    bin_to_dec bcd_x(
+        .bin(adc_value_x[11:6]), 
+        .bcd(x_bcd)
+        );
+    
+    bin_to_dec bcd_y(
+        .bin(adc_value_y[11:6]), 
+        .bcd(y_bcd)
+        );
+
+    fnd_cntr fnd(
+        .clk(clk), 
+        .reset_p(reset_p),
+        .fnd_value({x_bcd, y_bcd}),
+        .hex_bcd(1),
+        .seg_7(seg_7), .com(com)
+        );
+
+    pwm_Nfreq_Nstep #(
+        .duty_step_N(128))
+        pwm_led_g(
+            clk, 
+            reset_p,
+            adc_value_x[11:4],
+            led_g
+        );
+
+    pwm_Nfreq_Nstep #(
+        .duty_step_N(128))
+        pwm_led_b(
+            clk, 
+            reset_p,
+            adc_value_y[11:6],
+            led_b
+        );
+
 endmodule
