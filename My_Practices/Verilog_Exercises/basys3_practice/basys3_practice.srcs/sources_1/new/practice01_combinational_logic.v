@@ -212,7 +212,7 @@ endmodule
 module full_adder_dataflow (
     input A, B, cin,     // 입력 핀 3개: A, B, 올림수(cin)
     output sum, carry    // 출력 핀 2개: 합(sum), 올림(carry)
-);
+    );
     
     // wire: 전선처럼 동작하는 변수. 값이 바뀌면 즉시 출력으로 연결됨.
     // [1:0] sum_value: 2비트 크기의 wire 선언
@@ -233,15 +233,62 @@ endmodule
 
 module fadder_4bit_dataflow(
     input [3:0] A, B,   // A 4bit, B 4bit 입력
-    input cin,          // carry 입출력은 1bit
-    output [3:0] sum, 
-    output carry
+    input cin,          // carry 입력은 1bit 라서 따로적음
+    output [3:0] sum,   // 마찬가지로 4bit + 4bit는 4bit
+    output carry        // carry 출력 1bit 따로 적음
     );
 
-    wire [1:0] sum_value;
+    wire [4:0] sum_value;   
     
     assign sum_value = A + B + cin;
-    assign sum = sum_value[0];
-    assign carry = sum_value[1];
+    // A, B 각각 4bit에서 가장 큰 값 : 1 1 1 1 -> 15, cin 1bit 가장 큰 값 : 1
+    // A + B + cin = 15 + 15 + 1 = 31 을 이진수로 바꾸면 1 1 1 1 로 5bit
+    // 즉, 출력은 5비트 까지 받아야하므로 wire [4:0] sum_value 가 된다.
+
+    assign sum = sum_value[3:0];    // 하위 4비트
+    assign carry = sum_value[4];    // 최상위 비트인 4번 비트
+
+endmodule
+
+module fadder_4bit_structural (
+    input [3:0] A, B,
+    input cin,
+    output [3:0] sum,
+    output carry
+    );
+    
+    wire [2:0] carry_w; // carry가 3개 필요하니까 3비트짜리로 선언
+
+    full_adder_structural fa0(  // . 은 인스턴스의 입력, ()는 현재모듈 
+        .A(A[0]),   // 4bit A 입력중의 0번째
+        .B(B[0]), 
+        .cin(),            
+        .sum(), 
+        .carry()
+    );
+
+    full_adder_structural fa1(
+        .A(), 
+        .B(), 
+        .cin(),            
+        .sum(), 
+        .carry()
+    );
+
+    full_adder_structural fa2(
+        .A(), 
+        .B(), 
+        .cin(),            
+        .sum(), 
+        .carry()
+    );
+
+    full_adder_structural fa3(
+        .A(), 
+        .B(), 
+        .cin(),            
+        .sum(), 
+        .carry()
+    );
 
 endmodule
