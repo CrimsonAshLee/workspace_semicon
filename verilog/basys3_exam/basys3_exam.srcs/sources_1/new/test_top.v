@@ -1349,7 +1349,7 @@ module sg90_top (
     pwm_Nfreq_Nstep #(
         .pwm_freq(50),
         .duty_step_N(1440))
-        pwm_sg90(
+        pwm_sg90(   // 인스턴스명
             clk, 
             reset_p, 
             step, 
@@ -1498,4 +1498,77 @@ module adc_sequence2_top (
             led_b
         );
 
+endmodule
+
+module rain_curtain_top (
+    input clk,
+    input reset_p,
+    input [1:0] btn,
+    output rain_curtain
+    );
+    
+    wire btn_up_pedge, btn_down_pedge;
+    btn_cntr btn_up_m(
+        .clk(clk),
+        .reset_p(reset_p),
+        .btn(btn[0]),
+        .btn_pedge(btn_up_pedge)
+    );
+    btn_cntr btn_down_m(
+        .clk(clk),
+        .reset_p(reset_p),
+        .btn(btn[1]),
+        .btn_pedge(btn_down_pedge)
+    );
+
+    // FSM
+    integer step;
+    always @(posedge clk or posedge reset_p) begin
+        if (reset_p) begin
+            step <= 90;
+        end
+        else if (btn_up_pedge) begin
+            if (step < 189) begin
+                step <= step + 1;
+            end
+        end
+        else if (btn_down_pedge) begin
+            if (step > 18) begin
+                step <= step - 1;
+            end
+        end
+    end
+
+    pwm_Nfreq_Nstep #(
+        .pwm_freq(50),
+        .duty_step_N(1440))
+        pwm_sg90(
+            clk, 
+            reset_p, 
+            step, 
+            rain_curtain
+    );
+
+endmodule
+
+module MQ2gas_top (
+    input clk,
+    input reset_p,
+    input gas_d0,
+    output reg alarm_led // 경고 LED 출력
+);
+
+    always @(posedge clk or posedge reset_p) begin
+        if (reset_p) begin
+            alarm_led <= 1'b0;
+        end
+        else if (!gas_d0) begin // D0 핀이 HIGH일 때
+            alarm_led <= 1'b1; // LED 켜기
+        end
+        else begin
+            alarm_led <= 1'b0; // LED 끄기
+        end
+    end
+
+    
 endmodule

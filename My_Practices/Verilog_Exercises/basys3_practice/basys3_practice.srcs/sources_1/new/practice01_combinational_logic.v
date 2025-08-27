@@ -250,6 +250,25 @@ module fadder_4bit_dataflow(
 
 endmodule
 
+// module fadder_Nbit_dataflow(
+//     input [N:0] A, B,   // A 4bit, B 4bit 입력
+//     input cin,          // carry 입력은 1bit 라서 따로적음
+//     output [N:0] sum,   // 마찬가지로 4bit + 4bit는 4bit
+//     output carry        // carry 출력 1bit 따로 적음
+//     );
+
+//     wire [N:0] sum_value;   
+    
+//     assign sum_value = A + B + cin;
+//     // A, B 각각 4bit에서 가장 큰 값 : 1 1 1 1 -> 15, cin 1bit 가장 큰 값 : 1
+//     // A + B + cin = 15 + 15 + 1 = 31 을 이진수로 바꾸면 1 1 1 1 로 5bit
+//     // 즉, 출력은 5비트 까지 받아야하므로 wire [4:0] sum_value 가 된다.
+
+//     assign sum = sum_value[N:0];    // 하위 4비트
+//     assign carry = sum_value[N+1];    // 최상위 비트인 4번 비트
+
+// endmodule
+
 module fadder_4bit_structural (
     input [3:0] A, B,
     input cin,
@@ -260,35 +279,36 @@ module fadder_4bit_structural (
     wire [2:0] carry_w; // carry가 3개 필요하니까 3비트짜리로 선언
 
     full_adder_structural fa0(  // . 은 인스턴스의 입력, ()는 현재모듈 
-        .A(A[0]),   // 4bit A 입력중의 0번째
+        .A(A[0]),   // .A(4bit A 입력중의 0번째)
         .B(B[0]), 
-        .cin(),            
-        .sum(), 
-        .carry()
+        .cin(cin),            
+        .sum(sum[0]), // .sum(출력 sum의 0번째) 
+        .carry(carry_w[0])
     );
 
     full_adder_structural fa1(
-        .A(), 
-        .B(), 
-        .cin(),            
-        .sum(), 
-        .carry()
+        .A(A[1]), 
+        .B(B[1]), 
+        .cin(carry_w[0]),            
+        .sum(sum[1]), 
+        .carry(carry_w[1])
     );
 
     full_adder_structural fa2(
-        .A(), 
-        .B(), 
-        .cin(),            
-        .sum(), 
-        .carry()
+        .A(A[2]), 
+        .B(B[2]), 
+        .cin(carry_w[1]),            
+        .sum(sum[2]), 
+        .carry(carry_w[2])
     );
 
     full_adder_structural fa3(
-        .A(), 
-        .B(), 
-        .cin(),            
-        .sum(), 
-        .carry()
+        .A(A[3]), 
+        .B(B[3]), 
+        .cin(carry_w[2]),            
+        .sum(sum[3]), 
+        .carry(carry)   // 마지막은 출력의 carry로 간다
     );
 
 endmodule
+

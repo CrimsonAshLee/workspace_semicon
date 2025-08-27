@@ -897,6 +897,7 @@ module pwm_Nfreq_Nstep (
     parameter duty_step_N = 200;    // default값
     parameter temp = sys_clk_freq / pwm_freq / duty_step_N / 2;
 
+    // 주기생성 블록
     integer cnt;
     reg pwm_freqXn;
     always @(posedge clk, posedge reset_p) begin
@@ -923,6 +924,7 @@ module pwm_Nfreq_Nstep (
         .n_edge(pwm_freqXn_nedge)
     );
 
+    // 듀티 사이클 제어 블록
     // reg [6:0] cnt_duty; // 128 일때
     integer cnt_duty;   // 200 일때.
     always @(posedge clk, posedge reset_p) begin
