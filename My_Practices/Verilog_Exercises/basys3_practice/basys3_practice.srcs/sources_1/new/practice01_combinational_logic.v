@@ -250,10 +250,10 @@ module fadder_4bit_dataflow(
 
 endmodule
 
-// module fadder_Nbit_dataflow(
-//     input [N:0] A, B,   // A 4bit, B 4bit 입력
+// module fadder_Nbit_dataflow( // ex) 16bit 로 가정
+//     input [N-1:0] A, B,   // A 4bit, B 4bit 입력
 //     input cin,          // carry 입력은 1bit 라서 따로적음
-//     output [N:0] sum,   // 마찬가지로 4bit + 4bit는 4bit
+//     output [N-1:0] sum,   // 마찬가지로 4bit + 4bit는 4bit
 //     output carry        // carry 출력 1bit 따로 적음
 //     );
 
@@ -264,51 +264,58 @@ endmodule
 //     // A + B + cin = 15 + 15 + 1 = 31 을 이진수로 바꾸면 1 1 1 1 로 5bit
 //     // 즉, 출력은 5비트 까지 받아야하므로 wire [4:0] sum_value 가 된다.
 
-//     assign sum = sum_value[N:0];    // 하위 4비트
-//     assign carry = sum_value[N+1];    // 최상위 비트인 4번 비트
+//     assign sum = sum_value[N-1:0];    // 하위 4비트
+//     assign carry = sum_value[N];    // 최상위 비트인 4번 비트
 
 // endmodule
 
 module fadder_4bit_structural (
-    input [3:0] A, B,
-    input cin,
-    output [3:0] sum,
-    output carry
+    input [3:0] A, B,    // 4비트 입력 A, B
+    input cin,           // 1비트 입력 캐리(carry-in)
+    output [3:0] sum,    // 4비트 출력 합(sum)
+    output carry         // 1비트 출력 최종 캐리(carry-out)
     );
     
-    wire [2:0] carry_w; // carry가 3개 필요하니까 3비트짜리로 선언
-
-    full_adder_structural fa0(  // . 은 인스턴스의 입력, ()는 현재모듈 
-        .A(A[0]),   // .A(4bit A 입력중의 0번째)
-        .B(B[0]), 
-        .cin(cin),            
-        .sum(sum[0]), // .sum(출력 sum의 0번째) 
-        .carry(carry_w[0])
+     wire [2:0] carry_w; // carry가 3개 필요하니까 3비트짜리로 선언
+    // 내부적으로 1비트 전가산기 모듈들을 연결하기 위한 임시 '전선' 역할을 하는 wire를 선언합니다.
+    // 총 3개의 내부 올림수(carry)가 필요하므로 3비트 와이어([2:0])를 선언합니다.
+    
+    // .은 인스턴스 모듈, ()는 현재 모듈
+    // 0번째 비트의 덧셈을 담당하는 첫 번째 1비트 전가산기 모듈
+    full_adder_structural fa0(  // fa0: 이 모듈의 인스턴스 이름
+        .A(A[0]),         // .A: 1비트 fadder 모듈의 A 입력에, 현재 모듈의 A 입력 중 0번 비트([0])를 연결
+        .B(B[0]),         // .B: 1비트 전가산기 모듈의 B 입력에, 현재 모듈의 B 입력 중 0번 비트([0])를 연결
+        .cin(cin),        // .cin: 1비트 전가산기 모듈의 cin에, 현재 모듈의 cin을 연결
+        .sum(sum[0]),     // .sum: 1비트 전가산기 모듈의 sum 출력에, 현재 모듈의 sum 출력 중 0번 비트를 연결
+        .carry(carry_w[0]) // .carry: 1비트 전가산기 모듈의 carry 출력에, 내부 와이어 carry_w의 0번 비트를 연결
     );
+    // 이와 같은 방식으로 4개의 1비트 전가산기 모듈을 인스턴스화하여 연결합니다.
 
+    // 1번째 비트의 덧셈을 담당하는 두 번째 1비트 전가산기 모듈
     full_adder_structural fa1(
         .A(A[1]), 
         .B(B[1]), 
-        .cin(carry_w[0]),            
+        .cin(carry_w[0]), // 이전 모듈(fa0)의 carry 출력을 현재 모듈(fa1)의 cin 입력에 연결
         .sum(sum[1]), 
         .carry(carry_w[1])
     );
 
+    // 2번째 비트의 덧셈을 담당하는 세 번째 1비트 전가산기 모듈
     full_adder_structural fa2(
         .A(A[2]), 
         .B(B[2]), 
-        .cin(carry_w[1]),            
+        .cin(carry_w[1]), // 이전 모듈(fa1)의 carry 출력을 현재 모듈(fa2)의 cin 입력에 연결
         .sum(sum[2]), 
         .carry(carry_w[2])
     );
 
+    // 3번째 비트의 덧셈을 담당하는 네 번째 1비트 전가산기 모듈
     full_adder_structural fa3(
         .A(A[3]), 
         .B(B[3]), 
-        .cin(carry_w[2]),            
+        .cin(carry_w[2]), // 이전 모듈(fa2)의 carry 출력을 현재 모듈(fa3)의 cin 입력에 연결
         .sum(sum[3]), 
-        .carry(carry)   // 마지막은 출력의 carry로 간다
+        .carry(carry)     // 마지막 모듈의 carry 출력을 최종 carry 출력 핀에 연결
     );
 
 endmodule
-
