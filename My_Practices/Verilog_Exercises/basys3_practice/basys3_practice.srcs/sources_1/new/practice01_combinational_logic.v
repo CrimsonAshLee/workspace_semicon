@@ -319,3 +319,4 @@ module fadder_4bit_structural (
     );
 
 endmodule
+
