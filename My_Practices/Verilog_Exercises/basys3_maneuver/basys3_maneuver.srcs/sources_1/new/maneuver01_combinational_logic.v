@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 08/12/2025 06:44:36 PM
+// Create Date: 09/01/2025 09:04:12 PM
 // Design Name: 
-// Module Name: practice01_combinational_logic
+// Module Name: maneuver01_combinational_logic
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -367,4 +367,31 @@ module demux_1_4_d (  // 1개 입력, 4개 출력 디멀티플렉서
                (s == 2'b10) ? {1'b0, d, 2'b00} : // s가 '10'일 때, d를 f[2]으로 분배 (0d00)
                {d, 3'b000};                      // s가 '11'일 때, d를 f[3]으로 분배 (d000)
 
+endmodule
+
+module mux_demux_test (
+    input [3:0] d,         // 4비트 데이터 입력 (멀티플렉서 입력)
+    input [1:0] mux_s,     // 2비트 멀티플렉서 선택 신호
+    input [1:0] demux_s,   // 2비트 디멀티플렉서 선택 신호
+    output [3:0] f         // 4비트 데이터 출력 (디멀티플렉서 출력)
+);
+
+    wire mux_f;            // mux의 출력이자 demux의 입력으로 사용될 단일 비트 신호
+
+    // mux_4_1 모듈 인스턴스화
+    // 4개의 입력 d 중 mux_s가 가리키는 비트를 mux_f로 내보냄
+    mux_4_1 mux_4(
+        .d(d),         // 상위 모듈의 d를 mux_4_1의 d와 연결
+        .s(mux_s),     // 상위 모듈의 mux_s를 mux_4_1의 s와 연결
+        .f(mux_f)      // mux_4_1의 출력 f를 상위 모듈의 mux_f에 연결
+    );
+    
+    // demux_1_4_d 모듈 인스턴스화
+    // 1개의 입력 mux_f를 demux_s가 가리키는 f의 비트로 분배함
+    demux_1_4_d demux4(
+        .d(mux_f),     // 상위 모듈의 mux_f를 demux_1_4_d의 d와 연결
+        .s(demux_s),   // 상위 모듈의 demux_s를 demux_1_4_d의 s와 연결
+        .f(f)          // demux_1_4_d의 출력 f를 상위 모듈의 f에 연결
+    );
+    
 endmodule
