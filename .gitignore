@@ -1,4 +1,4 @@
-# 공통
+# 공통 (모든 OS와 IDE에 공통적으로 적용)
 *~
 *.bak
 *.tmp
@@ -40,7 +40,7 @@ Release/
 *.lst
 .settings/
 
-# Vivado
+# Vivado / Vitis
 *.jou
 *.str
 *.backup
@@ -53,6 +53,9 @@ Release/
 *.opt_design*
 *.place*
 *.route*
+.sdk/
+.project
+.cproject
 
 # CMake
 CMakeCache.txt
