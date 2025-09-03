@@ -1,6 +1,6 @@
-#line 1 "../platform_led_sw/hw/sdt/system-top.dts"
+#line 1 "../platform_btn_fnd/hw/sdt/system-top.dts"
 /dts-v1/;
-#line 1 "../platform_led_sw/hw/sdt/pl.dtsi"
+#line 1 "../platform_btn_fnd/hw/sdt/pl.dtsi"
 / {
 	cpus_microblaze_riscv_0: cpus_microblaze_riscv@0 {
 		#cpu-mask-cells = <1>;
@@ -154,12 +154,42 @@
 		compatible = "simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
-		axi_gpio_led_sw: gpio@40000000 {
-			xlnx,gpio-board-interface = "led_16bits";
+		axi_gpio_btn: gpio@40010000 {
+			xlnx,gpio-board-interface = "push_buttons_4bits";
+			compatible = "xlnx,axi-gpio-2.0" , "xlnx,xps-gpio-1.00.a";
+			xlnx,all-outputs = <0>;
+			#gpio-cells = <2>;
+			xlnx,gpio-width = <4>;
+			clock-frequency = <100000000>;
+			xlnx,rable = <0>;
+			xlnx,dout-default = <0x0>;
+			xlnx,is-dual = <0>;
+			xlnx,ip-name = "axi_gpio";
+			xlnx,tri-default-2 = <0xffffffff>;
+			reg = <0x40010000 0x10000>;
+			xlnx,all-inputs-2 = <0>;
+			clocks = <&clk_bus_0>;
+			xlnx,all-outputs-2 = <0>;
+			gpio-controller;
+			xlnx,interrupt-present = <0>;
+			xlnx,gpio2-board-interface = "Custom";
+			xlnx,edk-iptype = "PERIPHERAL";
+			xlnx,dout-default-2 = <0x0>;
+			status = "okay";
+			xlnx,gpio2-width = <32>;
+			clock-names = "s_axi_aclk";
+			xlnx,use-board-flow;
+			xlnx,tri-default = <0xffffffff>;
+			xlnx,name = "axi_gpio_btn";
+			xlnx,all-inputs = <1>;
+		};
+		axi_gpio_fnd: gpio@40000000 {
+			#interrupt-cells = <2>;
+			xlnx,gpio-board-interface = "seven_seg_led_an";
 			compatible = "xlnx,axi-gpio-2.0" , "xlnx,xps-gpio-1.00.a";
 			xlnx,all-outputs = <1>;
 			#gpio-cells = <2>;
-			xlnx,gpio-width = <16>;
+			xlnx,gpio-width = <4>;
 			clock-frequency = <100000000>;
 			xlnx,rable = <0>;
 			xlnx,dout-default = <0x0>;
@@ -167,20 +197,21 @@
 			xlnx,ip-name = "axi_gpio";
 			xlnx,tri-default-2 = <0xffffffff>;
 			reg = <0x40000000 0x10000>;
-			xlnx,all-inputs-2 = <1>;
+			xlnx,all-inputs-2 = <0>;
 			clocks = <&clk_bus_0>;
-			xlnx,all-outputs-2 = <0>;
+			xlnx,all-outputs-2 = <1>;
 			gpio-controller;
-			xlnx,interrupt-present = <0>;
-			xlnx,gpio2-board-interface = "dip_switches_16bits";
+			xlnx,interrupt-present = <1>;
+			xlnx,gpio2-board-interface = "seven_seg_led_disp";
 			xlnx,edk-iptype = "PERIPHERAL";
 			xlnx,dout-default-2 = <0x0>;
 			status = "okay";
-			xlnx,gpio2-width = <16>;
+			xlnx,gpio2-width = <8>;
 			clock-names = "s_axi_aclk";
 			xlnx,use-board-flow;
+			interrupt-controller;
 			xlnx,tri-default = <0xffffffff>;
-			xlnx,name = "axi_gpio_led_sw";
+			xlnx,name = "axi_gpio_fnd";
 			xlnx,all-inputs = <0>;
 		};
 		axi_uartlite_0: serial@40600000 {
@@ -274,7 +305,7 @@
 		};
 	};
 };
-#line 3 "../platform_led_sw/hw/sdt/system-top.dts"
+#line 3 "../platform_btn_fnd/hw/sdt/system-top.dts"
 / {
 	board = "basys3";
 	compatible = "xlnx,basys3";
@@ -299,7 +330,8 @@
 	cpus_microblaze_riscv_0: cpus_microblaze_riscv@0 {
 		address-map = <0x00000000 &microblaze_riscv_0_local_memory_dlmb_bram_if_cntlr_memory 0x00000000 0x20000>,
 			      <0x00000000 &microblaze_riscv_0_local_memory_dlmb_bram_if_cntlr 0x00000000 0x20000>,
-			      <0x40000000 &axi_gpio_led_sw 0x40000000 0x10000>,
+			      <0x40000000 &axi_gpio_fnd 0x40000000 0x10000>,
+			      <0x40010000 &axi_gpio_btn 0x40010000 0x10000>,
 			      <0x40600000 &axi_uartlite_0 0x40600000 0x10000>;
 		#ranges-address-cells = <0x1>;
 		#ranges-size-cells = <0x1>;
