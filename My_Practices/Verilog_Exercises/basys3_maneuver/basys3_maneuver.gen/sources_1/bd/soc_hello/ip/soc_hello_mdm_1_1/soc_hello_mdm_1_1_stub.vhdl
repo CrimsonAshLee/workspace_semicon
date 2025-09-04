@@ -2,10 +2,10 @@
 -- Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
--- Date        : Wed Sep  3 01:30:42 2025
--- Host        : hongzerry-VMware-Virtual-Platform running 64-bit Ubuntu 24.04.3 LTS
+-- Date        : Thu Sep  4 10:41:07 2025
+-- Host        : user8-B70TV-AN5TB8W running 64-bit Ubuntu 24.04.3 LTS
 -- Command     : write_vhdl -force -mode synth_stub
---               /home/hongzerry/workspace_semicon/My_Practices/Verilog_Exercises/basys3_maneuver/basys3_maneuver.gen/sources_1/bd/soc_hello/ip/soc_hello_mdm_1_1/soc_hello_mdm_1_1_stub.vhdl
+--               /home/user8/workspace_semicon/My_Practices/Verilog_Exercises/basys3_maneuver/basys3_maneuver.gen/sources_1/bd/soc_hello/ip/soc_hello_mdm_1_1/soc_hello_mdm_1_1_stub.vhdl
 -- Design      : soc_hello_mdm_1_1
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xc7a35tcpg236-1

@@ -2,10 +2,10 @@
 -- Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
--- Date        : Wed Sep  3 01:30:39 2025
--- Host        : hongzerry-VMware-Virtual-Platform running 64-bit Ubuntu 24.04.3 LTS
--- Command     : write_vhdl -force -mode funcsim
---               /home/hongzerry/workspace_semicon/My_Practices/Verilog_Exercises/basys3_maneuver/basys3_maneuver.gen/sources_1/bd/soc_hello/ip/soc_hello_axi_uartlite_0_0/soc_hello_axi_uartlite_0_0_sim_netlist.vhdl
+-- Date        : Tue Sep  2 20:39:38 2025
+-- Host        : user8-B70TV-AN5TB8W running 64-bit Ubuntu 24.04.3 LTS
+-- Command     : write_vhdl -force -mode funcsim -rename_top soc_hello_axi_uartlite_0_0 -prefix
+--               soc_hello_axi_uartlite_0_0_ soc_hello_axi_uartlite_0_0_sim_netlist.vhdl
 -- Design      : soc_hello_axi_uartlite_0_0
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -21,8 +21,6 @@ entity soc_hello_axi_uartlite_0_0_baudrate is
     EN_16x_Baud_reg_0 : in STD_LOGIC;
     s_axi_aclk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_baudrate : entity is "baudrate";
 end soc_hello_axi_uartlite_0_0_baudrate;
 
 architecture STRUCTURE of soc_hello_axi_uartlite_0_0_baudrate is
@@ -362,8 +360,6 @@ entity soc_hello_axi_uartlite_0_0_cdc_sync is
     rx : in STD_LOGIC;
     s_axi_aclk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_cdc_sync : entity is "cdc_sync";
 end soc_hello_axi_uartlite_0_0_cdc_sync;
 
 architecture STRUCTURE of soc_hello_axi_uartlite_0_0_cdc_sync is
@@ -527,8 +523,6 @@ entity soc_hello_axi_uartlite_0_0_cntr_incr_decr_addn_f is
     s_axi_aresetn : in STD_LOGIC;
     s_axi_aclk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_cntr_incr_decr_addn_f : entity is "cntr_incr_decr_addn_f";
 end soc_hello_axi_uartlite_0_0_cntr_incr_decr_addn_f;
 
 architecture STRUCTURE of soc_hello_axi_uartlite_0_0_cntr_incr_decr_addn_f is
@@ -944,8 +938,6 @@ entity soc_hello_axi_uartlite_0_0_dynshreg_f is
     Q : in STD_LOGIC_VECTOR ( 3 downto 0 );
     s_axi_aclk : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_dynshreg_f : entity is "dynshreg_f";
 end soc_hello_axi_uartlite_0_0_dynshreg_f;
 
 architecture STRUCTURE of soc_hello_axi_uartlite_0_0_dynshreg_f is
@@ -1291,8 +1283,6 @@ entity soc_hello_axi_uartlite_0_0_pselect_f is
     \GEN_BKEND_CE_REGISTERS[0].ce_out_i_reg[0]\ : in STD_LOGIC;
     \GEN_BKEND_CE_REGISTERS[0].ce_out_i_reg[0]_0\ : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_pselect_f : entity is "pselect_f";
 end soc_hello_axi_uartlite_0_0_pselect_f;
 
 architecture STRUCTURE of soc_hello_axi_uartlite_0_0_pselect_f is
@@ -1383,8 +1373,6 @@ entity soc_hello_axi_uartlite_0_0_address_decoder is
     \GEN_BKEND_CE_REGISTERS[2].ce_out_i_reg[2]_2\ : in STD_LOGIC;
     \GEN_BKEND_CE_REGISTERS[2].ce_out_i_reg[2]_3\ : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_address_decoder : entity is "address_decoder";
 end soc_hello_axi_uartlite_0_0_address_decoder;
 
 architecture STRUCTURE of soc_hello_axi_uartlite_0_0_address_decoder is
@@ -1839,8 +1827,6 @@ entity soc_hello_axi_uartlite_0_0_srl_fifo_rbu_f is
     s_axi_aresetn : in STD_LOGIC;
     s_axi_wdata : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_srl_fifo_rbu_f : entity is "srl_fifo_rbu_f";
 end soc_hello_axi_uartlite_0_0_srl_fifo_rbu_f;
 
 architecture STRUCTURE of soc_hello_axi_uartlite_0_0_srl_fifo_rbu_f is
@@ -2038,8 +2024,6 @@ entity soc_hello_axi_uartlite_0_0_slave_attachment is
     s_axi_araddr : in STD_LOGIC_VECTOR ( 1 downto 0 );
     s_axi_awaddr : in STD_LOGIC_VECTOR ( 1 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_slave_attachment : entity is "slave_attachment";
 end soc_hello_axi_uartlite_0_0_slave_attachment;
 
 architecture STRUCTURE of soc_hello_axi_uartlite_0_0_slave_attachment is
@@ -2486,8 +2470,6 @@ entity soc_hello_axi_uartlite_0_0_srl_fifo_f is
     s_axi_aresetn : in STD_LOGIC;
     s_axi_wdata : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_srl_fifo_f : entity is "srl_fifo_f";
 end soc_hello_axi_uartlite_0_0_srl_fifo_f;
 
 architecture STRUCTURE of soc_hello_axi_uartlite_0_0_srl_fifo_f is
@@ -2609,8 +2591,6 @@ entity soc_hello_axi_uartlite_0_0_axi_lite_ipif is
     s_axi_araddr : in STD_LOGIC_VECTOR ( 1 downto 0 );
     s_axi_awaddr : in STD_LOGIC_VECTOR ( 1 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_axi_lite_ipif : entity is "axi_lite_ipif";
 end soc_hello_axi_uartlite_0_0_axi_lite_ipif;
 
 architecture STRUCTURE of soc_hello_axi_uartlite_0_0_axi_lite_ipif is
@@ -2679,8 +2659,6 @@ entity soc_hello_axi_uartlite_0_0_uartlite_rx is
     \INFERRED_GEN.cnt_i_reg[0]\ : in STD_LOGIC;
     rx : in STD_LOGIC
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_uartlite_rx : entity is "uartlite_rx";
 end soc_hello_axi_uartlite_0_0_uartlite_rx;
 
 architecture STRUCTURE of soc_hello_axi_uartlite_0_0_uartlite_rx is
@@ -3315,8 +3293,6 @@ entity soc_hello_axi_uartlite_0_0_uartlite_tx is
     s_axi_aresetn : in STD_LOGIC;
     s_axi_wdata : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_uartlite_tx : entity is "uartlite_tx";
 end soc_hello_axi_uartlite_0_0_uartlite_tx;
 
 architecture STRUCTURE of soc_hello_axi_uartlite_0_0_uartlite_tx is
@@ -3605,8 +3581,6 @@ entity soc_hello_axi_uartlite_0_0_uartlite_core is
     rx : in STD_LOGIC;
     s_axi_wdata : in STD_LOGIC_VECTOR ( 7 downto 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_uartlite_core : entity is "uartlite_core";
 end soc_hello_axi_uartlite_0_0_uartlite_core;
 
 architecture STRUCTURE of soc_hello_axi_uartlite_0_0_uartlite_core is
@@ -3800,8 +3774,6 @@ entity soc_hello_axi_uartlite_0_0_axi_uartlite is
   attribute C_S_AXI_DATA_WIDTH of soc_hello_axi_uartlite_0_0_axi_uartlite : entity is 32;
   attribute C_USE_PARITY : integer;
   attribute C_USE_PARITY of soc_hello_axi_uartlite_0_0_axi_uartlite : entity is 0;
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of soc_hello_axi_uartlite_0_0_axi_uartlite : entity is "axi_uartlite";
   attribute downgradeipidentifiedwarnings : string;
   attribute downgradeipidentifiedwarnings of soc_hello_axi_uartlite_0_0_axi_uartlite : entity is "yes";
 end soc_hello_axi_uartlite_0_0_axi_uartlite;

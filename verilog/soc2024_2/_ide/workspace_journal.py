@@ -1,49 +1,17 @@
-# 2025-09-03T14:13:10.178166
+# 2025-09-04T16:10:47.892706
 import vitis
 
 client = vitis.create_client()
 client.set_workspace(path="soc2024_2")
 
-client.delete_component(name="app_btn_fnd")
+platform = client.create_platform_component(name = "platform_dht11",hw_design = "$COMPONENT_LOCATION/../../basys3_exam/soc_dht11_wrapper.xsa",os = "standalone",cpu = "microblaze_riscv_0",domain_name = "standalone_microblaze_riscv_0")
 
-client.delete_component(name="app_btn_fnds")
+comp = client.create_app_component(name="app_dht11",platform = "$COMPONENT_LOCATION/../platform_dht11/export/platform_dht11/platform_dht11.xpfm",domain = "standalone_microblaze_riscv_0",template = "hello_world")
 
-platform = client.create_platform_component(name = "platform_btn_fnd",hw_design = "$COMPONENT_LOCATION/../../basys3_exam/soc_btn_fnd_wrapper.xsa",os = "standalone",cpu = "microblaze_riscv_0",domain_name = "standalone_microblaze_riscv_0")
-
-comp = client.create_app_component(name="app_btn_fnd",platform = "$COMPONENT_LOCATION/../platform_btn_fnd/export/platform_btn_fnd/platform_btn_fnd.xpfm",domain = "standalone_microblaze_riscv_0",template = "hello_world")
-
-platform = client.get_component(name="platform_btn_fnd")
+platform = client.get_component(name="platform_dht11")
 status = platform.build()
 
-comp = client.get_component(name="app_btn_fnd")
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
+comp = client.get_component(name="app_dht11")
 comp.build()
 
 vitis.dispose()
