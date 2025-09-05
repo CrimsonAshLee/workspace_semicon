@@ -2,7 +2,7 @@
 //Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
 //Tool Version: Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-//Date        : Thu Sep  4 14:35:21 2025
+//Date        : Fri Sep  5 10:26:33 2025
 //Host        : user8-B70TV-AN5TB8W running 64-bit Ubuntu 24.04.3 LTS
 //Command     : generate_target soc_dht11_wrapper.bd
 //Design      : soc_dht11_wrapper

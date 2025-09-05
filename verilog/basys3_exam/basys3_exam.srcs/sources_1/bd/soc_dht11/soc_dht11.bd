@@ -6,7 +6,7 @@
       "gen_directory": "../../../../basys3_exam.gen/sources_1/bd/soc_dht11",
       "name": "soc_dht11",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
-      "synth_flow_mode": "Hierarchical",
+      "synth_flow_mode": "None",
       "tool_version": "2024.2",
       "validated": "true"
     },
@@ -478,7 +478,7 @@
       },
       "myip_dht11_0": {
         "vlnv": "user.org:user:myip_dht11:1.0",
-        "ip_revision": "2",
+        "ip_revision": "3",
         "xci_name": "soc_dht11_myip_dht11_0_0",
         "xci_path": "ip/soc_dht11_myip_dht11_0_0/soc_dht11_myip_dht11_0_0.xci",
         "inst_hier_path": "myip_dht11_0"

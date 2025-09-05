@@ -942,8 +942,8 @@ module dht11_top (
         );
 
     wire [7:0] humi_bcd, tmpr_bcd;
-    bin_to_dec bcd_sec(.bin(humidity), .bcd(humi_bcd));
-    bin_to_dec bcd_csec(.bin(temperature), .bcd(tmpr_bcd));
+    bin_to_dec bcd_humi(.bin(humidity), .bcd(humi_bcd));
+    bin_to_dec bcd_tmpr(.bin(temperature), .bcd(tmpr_bcd));
 
     fnd_cntr fnd(
         .clk(clk), 

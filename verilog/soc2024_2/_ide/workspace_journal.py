@@ -1,8 +1,12 @@
-# 2025-09-04T16:10:47.892706
+# 2025-09-05T10:47:52.069909
 import vitis
 
 client = vitis.create_client()
 client.set_workspace(path="soc2024_2")
+
+client.delete_component(name="app_dht11")
+
+client.delete_component(name="platform_dht11")
 
 platform = client.create_platform_component(name = "platform_dht11",hw_design = "$COMPONENT_LOCATION/../../basys3_exam/soc_dht11_wrapper.xsa",os = "standalone",cpu = "microblaze_riscv_0",domain_name = "standalone_microblaze_riscv_0")
 
@@ -12,6 +16,14 @@ platform = client.get_component(name="platform_dht11")
 status = platform.build()
 
 comp = client.get_component(name="app_dht11")
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
 comp.build()
 
 vitis.dispose()

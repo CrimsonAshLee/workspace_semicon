@@ -48,7 +48,7 @@
 
 
 // IP VLNV: user.org:user:myip_dht11:1.0
-// IP Revision: 2
+// IP Revision: 3
 
 (* X_CORE_INFO = "myip_dht11,Vivado 2024.2" *)
 (* CHECK_LICENSE_TYPE = "soc_dht11_myip_dht11_0_0,myip_dht11,{}" *)

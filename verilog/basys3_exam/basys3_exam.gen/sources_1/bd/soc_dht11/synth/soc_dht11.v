@@ -2,7 +2,7 @@
 //Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
 //Tool Version: Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-//Date        : Thu Sep  4 14:35:21 2025
+//Date        : Fri Sep  5 10:26:32 2025
 //Host        : user8-B70TV-AN5TB8W running 64-bit Ubuntu 24.04.3 LTS
 //Command     : generate_target soc_dht11.bd
 //Design      : soc_dht11
@@ -223,7 +223,7 @@ module microblaze_riscv_0_local_memory_imp_1TZ0W4V
         .web({microblaze_riscv_0_ilmb_cntlr_WE[0],microblaze_riscv_0_ilmb_cntlr_WE[1],microblaze_riscv_0_ilmb_cntlr_WE[2],microblaze_riscv_0_ilmb_cntlr_WE[3]}));
 endmodule
 
-(* CORE_GENERATION_INFO = "soc_dht11,IP_Integrator,{x_ipVendor=xilinx.com,x_ipLibrary=BlockDiagram,x_ipName=soc_dht11,x_ipVersion=1.00.a,x_ipLanguage=VERILOG,numBlks=13,numReposBlks=12,numNonXlnxBlks=1,numHierBlks=1,maxHierDepth=1,numSysgenBlks=0,numHlsBlks=0,numHdlrefBlks=0,numPkgbdBlks=0,bdsource=USER,da_axi4_cnt=2,da_board_cnt=2,da_clkrst_cnt=1,da_microblaze_riscv_cnt=1,synth_mode=Hierarchical}" *) (* HW_HANDOFF = "soc_dht11.hwdef" *) 
+(* CORE_GENERATION_INFO = "soc_dht11,IP_Integrator,{x_ipVendor=xilinx.com,x_ipLibrary=BlockDiagram,x_ipName=soc_dht11,x_ipVersion=1.00.a,x_ipLanguage=VERILOG,numBlks=13,numReposBlks=12,numNonXlnxBlks=1,numHierBlks=1,maxHierDepth=1,numSysgenBlks=0,numHlsBlks=0,numHdlrefBlks=0,numPkgbdBlks=0,bdsource=USER,da_axi4_cnt=2,da_board_cnt=2,da_clkrst_cnt=1,da_microblaze_riscv_cnt=1,synth_mode=None}" *) (* HW_HANDOFF = "soc_dht11.hwdef" *) 
 module soc_dht11
    (dht11_data_0,
     led_0,

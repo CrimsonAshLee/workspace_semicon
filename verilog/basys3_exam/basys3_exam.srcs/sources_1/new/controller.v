@@ -223,7 +223,7 @@ module dht11_cntr (
                     // end
                     // else begin
                     count_usec_e = 1;
-                    if (count_usec > 22'd100_00) begin
+                    if (count_usec > 22'd100_000) begin
                         count_usec_e = 0;
                         next_state = S_IDLE;
                     end
@@ -235,7 +235,7 @@ module dht11_cntr (
                 end
                 S_LOW_80US: begin
                     count_usec_e = 1;
-                    if (count_usec > 22'd100_00) begin
+                    if (count_usec > 22'd100_000) begin
                         count_usec_e = 0;
                         next_state = S_IDLE;
                     end
@@ -246,7 +246,7 @@ module dht11_cntr (
                 end
                 S_HIGH_80US: begin
                     count_usec_e = 1;
-                    if (count_usec > 22'd100_00) begin
+                    if (count_usec > 22'd100_000) begin
                         count_usec_e = 0;
                         next_state = S_IDLE;
                     end

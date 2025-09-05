@@ -20,6 +20,10 @@
 #include <stdio.h>
 #include "platform.h"
 #include "xil_printf.h"
+#include "xparameters.h"
+#include "sleep.h"
+
+#define DHT11_ADDR XPAR_MYIP_DHT11_0_BASEADDR
 
 
 int main()
@@ -28,6 +32,15 @@ int main()
 
     print("Hello World\n\r");
     print("Successfully ran Hello World application");
+
+    volatile unsigned int *dht11_instance = (volatile unsigned int*)DHT11_ADDR;
+
+    while (1) {
+        printf("Humidity : %d\n", dht11_instance[0]);
+        printf("Temperature : %d\n", dht11_instance[1]);
+        sleep(4);
+    }
+
     cleanup_platform();
     return 0;
 }
