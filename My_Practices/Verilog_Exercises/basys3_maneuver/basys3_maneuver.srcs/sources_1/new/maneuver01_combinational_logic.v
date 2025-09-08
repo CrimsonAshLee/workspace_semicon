@@ -395,3 +395,17 @@ module mux_demux_test (
     );
     
 endmodule
+
+module decoder_2_4 (
+    input [1:0] code,       // 2비트 입력 (00, 01, 10, 11)
+    output [3:0] signal    // 4비트 출력 (하나의 비트만 1이 됨)
+);
+
+    // 삼항 연산자를 사용하여 디코더 논리를 구현
+    // 입력 'code'의 값에 따라 'signal'의 값을 결정
+    assign signal = (code == 2'b00) ? 4'b0001 : // code가 00일 때, signal의 가장 낮은 비트(0번)를 1로
+                    (code == 2'b01) ? 4'b0010 : // code가 01일 때, signal의 1번 비트를 1로
+                    (code == 2'b10) ? 4'b0100 : // code가 10일 때, signal의 2번 비트를 1로
+                    4'b1000;                    // 위의 모든 조건이 아니면 (code가 11일 때), signal의 가장 높은 비트(3번)를 1로
+    
+endmodule

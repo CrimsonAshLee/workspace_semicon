@@ -47,6 +47,7 @@
     <Option Name="ActiveSimSet" Val="sim_1"/>
     <Option Name="DefaultLib" Val="xil_defaultlib"/>
     <Option Name="ProjectType" Val="Default"/>
+    <Option Name="IPRepoPath" Val="$PPRDIR/../ip_repo/myip_iic_txtlcd_1_0"/>
     <Option Name="IPRepoPath" Val="$PPRDIR/../ip_repo/myip_dht11_1_0"/>
     <Option Name="IPRepoPath" Val="$PPRDIR/../ip_repo/myip_fnd_1_0"/>
     <Option Name="IPOutputRepo" Val="$PCACHEDIR/ip"/>
@@ -68,12 +69,12 @@
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="4"/>
-    <Option Name="WTModelSimExportSim" Val="4"/>
-    <Option Name="WTQuestaExportSim" Val="4"/>
+    <Option Name="WTXSimExportSim" Val="7"/>
+    <Option Name="WTModelSimExportSim" Val="7"/>
+    <Option Name="WTQuestaExportSim" Val="7"/>
     <Option Name="WTIesExportSim" Val="0"/>
-    <Option Name="WTVcsExportSim" Val="4"/>
-    <Option Name="WTRivieraExportSim" Val="4"/>
+    <Option Name="WTVcsExportSim" Val="7"/>
+    <Option Name="WTRivieraExportSim" Val="7"/>
     <Option Name="WTActivehdlExportSim" Val="0"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
@@ -92,64 +93,15 @@
   <FileSets Version="1" Minor="32">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
       <Filter Type="Srcs"/>
-      <File Path="$PSRCDIR/sources_1/bd/soc_dht11/soc_dht11.bd">
+      <File Path="$PSRCDIR/sources_1/bd/soc_txtlcd/soc_txtlcd.bd">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PGENDIR/sources_1/bd/soc_dht11/hdl/soc_dht11_wrapper.v">
+      <File Path="$PGENDIR/sources_1/bd/soc_txtlcd/hdl/soc_txtlcd_wrapper.v">
         <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/bd/soc_btn_fnd/soc_btn_fnd.bd">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_axi_gpio_1_0_1/soc_btn_fnd_axi_gpio_1_0.xci">
-          <Proxy FileSetName="soc_btn_fnd_axi_gpio_1_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_axi_smc_0_1/soc_btn_fnd_axi_smc_0.xci">
-          <Proxy FileSetName="soc_btn_fnd_axi_smc_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_axi_uartlite_0_0_1/soc_btn_fnd_axi_uartlite_0_0.xci">
-          <Proxy FileSetName="soc_btn_fnd_axi_uartlite_0_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_dlmb_bram_if_cntlr_0_1/soc_btn_fnd_dlmb_bram_if_cntlr_0.xci">
-          <Proxy FileSetName="soc_btn_fnd_dlmb_bram_if_cntlr_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_dlmb_v10_0_1/soc_btn_fnd_dlmb_v10_0.xci">
-          <Proxy FileSetName="soc_btn_fnd_dlmb_v10_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_ilmb_bram_if_cntlr_0_1/soc_btn_fnd_ilmb_bram_if_cntlr_0.xci">
-          <Proxy FileSetName="soc_btn_fnd_ilmb_bram_if_cntlr_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_ilmb_v10_0_1/soc_btn_fnd_ilmb_v10_0.xci">
-          <Proxy FileSetName="soc_btn_fnd_ilmb_v10_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_mdm_1_0_1/soc_btn_fnd_mdm_1_0.xci">
-          <Proxy FileSetName="soc_btn_fnd_mdm_1_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_microblaze_riscv_0_0_1/soc_btn_fnd_microblaze_riscv_0_0.xci">
-          <Proxy FileSetName="soc_btn_fnd_microblaze_riscv_0_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_myip_fnd_0_0/soc_btn_fnd_myip_fnd_0_0.xci">
-          <Proxy FileSetName="soc_btn_fnd_myip_fnd_0_0"/>
-        </CompFileExtendedInfo>
-        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_proc_sys_reset_0_0_1/soc_btn_fnd_proc_sys_reset_0_0.xci">
-          <Proxy FileSetName="soc_btn_fnd_proc_sys_reset_0_0"/>
-        </CompFileExtendedInfo>
-      </File>
-      <File Path="$PGENDIR/sources_1/bd/soc_btn_fnd/hdl/soc_btn_fnd_wrapper.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -200,6 +152,87 @@
         </CompFileExtendedInfo>
       </File>
       <File Path="$PGENDIR/sources_1/bd/soc_hello/hdl/soc_hello_wrapper.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/soc_dht11_iic/soc_dht11_iic.bd">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PGENDIR/sources_1/bd/soc_dht11_iic/hdl/soc_dht11_iic_wrapper.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/soc_dht11/soc_dht11.bd">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PGENDIR/sources_1/bd/soc_dht11/hdl/soc_dht11_wrapper.v">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
+      <File Path="$PSRCDIR/sources_1/bd/soc_btn_fnd/soc_btn_fnd.bd">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_axi_gpio_1_0_1/soc_btn_fnd_axi_gpio_1_0.xci">
+          <Proxy FileSetName="soc_btn_fnd_axi_gpio_1_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_axi_smc_0_1/soc_btn_fnd_axi_smc_0.xci">
+          <Proxy FileSetName="soc_btn_fnd_axi_smc_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_axi_uartlite_0_0_1/soc_btn_fnd_axi_uartlite_0_0.xci">
+          <Proxy FileSetName="soc_btn_fnd_axi_uartlite_0_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_dlmb_bram_if_cntlr_0_1/soc_btn_fnd_dlmb_bram_if_cntlr_0.xci">
+          <Proxy FileSetName="soc_btn_fnd_dlmb_bram_if_cntlr_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_dlmb_v10_0_1/soc_btn_fnd_dlmb_v10_0.xci">
+          <Proxy FileSetName="soc_btn_fnd_dlmb_v10_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_ilmb_bram_if_cntlr_0_1/soc_btn_fnd_ilmb_bram_if_cntlr_0.xci">
+          <Proxy FileSetName="soc_btn_fnd_ilmb_bram_if_cntlr_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_ilmb_v10_0_1/soc_btn_fnd_ilmb_v10_0.xci">
+          <Proxy FileSetName="soc_btn_fnd_ilmb_v10_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_mdm_1_0_1/soc_btn_fnd_mdm_1_0.xci">
+          <Proxy FileSetName="soc_btn_fnd_mdm_1_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_microblaze_riscv_0_0_1/soc_btn_fnd_microblaze_riscv_0_0.xci">
+          <Proxy FileSetName="soc_btn_fnd_microblaze_riscv_0_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_myip_fnd_0_0/soc_btn_fnd_myip_fnd_0_0.xci">
+          <Proxy FileSetName="soc_btn_fnd_myip_fnd_0_0"/>
+        </CompFileExtendedInfo>
+        <CompFileExtendedInfo CompFileName="soc_btn_fnd.bd" FileRelPathName="ip/soc_btn_fnd_proc_sys_reset_0_0_1/soc_btn_fnd_proc_sys_reset_0_0.xci">
+          <Proxy FileSetName="soc_btn_fnd_proc_sys_reset_0_0"/>
+        </CompFileExtendedInfo>
+      </File>
+      <File Path="$PGENDIR/sources_1/bd/soc_btn_fnd/hdl/soc_btn_fnd_wrapper.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -265,7 +298,7 @@
       </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="soc_dht11_wrapper"/>
+        <Option Name="TopModule" Val="soc_txtlcd_wrapper"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1" RelGenDir="$PGENDIR/constrs_1">
@@ -503,10 +536,10 @@
         <Step Id="synth_design"/>
       </Strategy>
       <ReportStrategy Name="Vivado Synthesis Default Reports" Flow="Vivado Synthesis 2024" CtrlBit="true">
-        <ReportConfig DisplayName="synthesis_report" Name="synth_1_copy_1_synth_synthesis_report_0" Spec="" RunStep="synth_design" ReportFile="soc_dht11_wrapper.vds">
+        <ReportConfig DisplayName="synthesis_report" Name="synth_1_copy_1_synth_synthesis_report_0" Spec="" RunStep="synth_design" ReportFile="soc_dht11_iic_wrapper.vds">
           <ReportConfigOption Name="dummy_option" Type="string"/>
         </ReportConfig>
-        <ReportConfig DisplayName="Utilization - Synth Design" Name="synth_1_copy_1_synth_report_utilization_0" Spec="report_utilization" RunStep="synth_design" ReportFile="soc_dht11_wrapper_utilization_synth_1.rpt" Version="1" Minor="0">
+        <ReportConfig DisplayName="Utilization - Synth Design" Name="synth_1_copy_1_synth_report_utilization_0" Spec="report_utilization" RunStep="synth_design" ReportFile="soc_dht11_iic_wrapper_utilization_synth.rpt" Version="1" Minor="0">
           <ReportConfigOption Name="dummy_option" Type="string"/>
           <ReportConfigOutputOption Name="pb" Type="string" Value=""/>
         </ReportConfig>

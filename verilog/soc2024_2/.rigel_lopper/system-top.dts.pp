@@ -1,6 +1,6 @@
-#line 1 "../platform_dht11/hw/sdt/system-top.dts"
+#line 1 "../platform_txtlcd/hw/sdt/system-top.dts"
 /dts-v1/;
-#line 1 "../platform_dht11/hw/sdt/pl.dtsi"
+#line 1 "../platform_txtlcd/hw/sdt/pl.dtsi"
 / {
 	cpus_microblaze_riscv_0: cpus_microblaze_riscv@0 {
 		#cpu-mask-cells = <1>;
@@ -243,20 +243,20 @@
 			xlnx,bram-awidth = <32>;
 			xlnx,lmb-awidth = <32>;
 		};
-		myip_dht11_0: myip_dht11@44a00000 {
+		myip_iic_txtlcd_0: myip_iic_txtlcd@44a00000 {
 			xlnx,rable = <0>;
 			xlnx,s00-axi-data-width = <32>;
-			compatible = "xlnx,myip-dht11-1.0";
+			compatible = "xlnx,myip-iic-txtlcd-1.0";
 			status = "okay";
 			xlnx,s00-axi-addr-width = <5>;
-			xlnx,ip-name = "myip_dht11";
+			xlnx,ip-name = "myip_iic_txtlcd";
 			xlnx,edk-iptype = "PERIPHERAL";
 			reg = <0x44a00000 0x10000>;
-			xlnx,name = "myip_dht11_0";
+			xlnx,name = "myip_iic_txtlcd_0";
 		};
 	};
 };
-#line 3 "../platform_dht11/hw/sdt/system-top.dts"
+#line 3 "../platform_txtlcd/hw/sdt/system-top.dts"
 / {
 	board = "basys3";
 	compatible = "xlnx,basys3";
@@ -282,7 +282,7 @@
 		address-map = <0x00000000 &microblaze_riscv_0_local_memory_dlmb_bram_if_cntlr_memory 0x00000000 0x20000>,
 			      <0x00000000 &microblaze_riscv_0_local_memory_dlmb_bram_if_cntlr 0x00000000 0x20000>,
 			      <0x40600000 &axi_uartlite_0 0x40600000 0x10000>,
-			      <0x44a00000 &myip_dht11_0 0x44a00000 0x10000>;
+			      <0x44a00000 &myip_iic_txtlcd_0 0x44a00000 0x10000>;
 		#ranges-address-cells = <0x1>;
 		#ranges-size-cells = <0x1>;
 	};
