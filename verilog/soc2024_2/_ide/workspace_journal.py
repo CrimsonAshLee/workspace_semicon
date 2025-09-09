@@ -1,12 +1,34 @@
-# 2025-09-08T15:46:47.403423
+# 2025-09-09T16:24:29.394589
 import vitis
 
 client = vitis.create_client()
 client.set_workspace(path="soc2024_2")
 
-platform = client.create_platform_component(name = "platform_txtlcd",hw_design = "$COMPONENT_LOCATION/../../basys3_exam/soc_txtlcd_wrapper.xsa",os = "standalone",cpu = "microblaze_riscv_0",domain_name = "standalone_microblaze_riscv_0")
+platform = client.get_component(name="platform_btn_fnd")
+status = platform.build()
 
-comp = client.create_app_component(name="app_txtlcd",platform = "$COMPONENT_LOCATION/../platform_txtlcd/export/platform_txtlcd/platform_txtlcd.xpfm",domain = "standalone_microblaze_riscv_0",template = "hello_world")
+comp = client.get_component(name="app_btn_fnd")
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+platform = client.get_component(name="platform_stopwatch")
+status = platform.build()
+
+comp = client.get_component(name="app_stopwatch")
+comp.build()
+
+platform = client.get_component(name="platform_txtlcd")
+status = platform.build()
+
+comp = client.get_component(name="app_txtlcd")
+comp.build()
 
 vitis.dispose()
 

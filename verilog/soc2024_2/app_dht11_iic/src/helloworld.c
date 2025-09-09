@@ -17,53 +17,16 @@
  *   ps7_uart    115200 (configured by bootrom/bsp)
  */
 
-// #include <stdio.h>
-// #include "platform.h"
-// #include "xparameters.h"
-// #include "xil_printf.h"
-// #include "sleep.h"
-// #include "xiic.h"
-
-// #define DHT11_ADDR XPAR_MYIP_DHT11_0_BASEADDR
-// #define IIC_ADDR   XPAR_AXI_IIC_0_BASEADDR
-
-// XIic iic_instance;
-
-// int main()
-// {
-//     init_platform();
-
-//     print("Start\n\r");
-//     print("Successfully ran Hello World application");
-//     XIic_Initialize(&iic_instance, IIC_ADDR);
-
-//     volatile unsigned int* dht11_instance = (volatile unsigned int*)DHT11_ADDR;
-
-//     uint8_t data_array[4];
-//     data_array[0] = 0b00001000;
-
-//     while(1) {
-//         printf("Humidity : %d\n", dht11_instance[0]);
-//         printf("Temperature : %d\n", dht11_instance[1]);
-//         sleep(4);
-//         data_array[0] = data_array[0] ^ 0b00001000; // d7 d6 d5 d4 BL en rw rs toggle
-//         XIic_Send(iic_instance.BaseAddress, 0x27, data_array, 1, XIIC_STOP);
-//     }
-
-//     cleanup_platform();
-//     return 0;
-// }
-
 #include <stdint.h>
 #include <stdio.h>
-#include <xiic_l.h>
 #include "platform.h"
 #include "xil_printf.h"
-#include "sleep.h"
 #include "xparameters.h"
+#include "sleep.h"
 #include "xiic.h"
 
-#define DHT11_ADDR XPAR_MYIP_DHT11_SUB_0_BASEADDR
+
+#define DHT11_ADDR XPAR_MYIP_DHT11_0_BASEADDR
 #define IIC_ADDR XPAR_AXI_IIC_0_BASEADDR
 
 XIic iic_instance;
@@ -78,7 +41,8 @@ void lcdCommand(uint8_t command)
   data_array[1] = high_nibble | 0x00 | 0x08;   
   data_array[2] = low_nibble | 0x04 | 0x08;    
   data_array[3] = low_nibble | 0x00 | 0x08;    
-  XIic_Send(iic_instance.BaseAddress, 0x27, data_array, 4, XIIC_STOP);
+  XIic_Send(iic_instance.BaseAddress, 0x27, 
+        data_array, 4, XIIC_STOP);
   usleep(50);
 }
 
@@ -92,8 +56,8 @@ void lcdData(uint8_t data)
   data_array[1] = high_nibble |0x01 |0x08;
   data_array[2] = low_nibble |0x05 |0x08;
   data_array[3] = low_nibble |0x01 |0x08;
-  XIic_Send(iic_instance.BaseAddress, 0x27, data_array, 4, XIIC_STOP);  // 임베디드랑 차이점
-  usleep(50);   // 통신할때 100khz 이므로 사실 없어도됨
+  XIic_Send(iic_instance.BaseAddress, 0x27, data_array, 4, XIIC_STOP);
+  usleep(50);
 }
 
 void i2cLcd_Init()
@@ -126,34 +90,32 @@ void moveCursor(uint8_t row, uint8_t col)
 void Display_clear()
 {
   lcdCommand(0x01);
-  usleep(2000); // 반드시 딜레이 줘야함
+  usleep(2000);
 }
+
 
 int main()
 {
     init_platform();
 
     print("Start\n\r");
-
-    volatile unsigned int *dht_instance = (volatile unsigned int*)DHT11_ADDR;
-
+    volatile unsigned int *dht11_instance = (volatile unsigned int*)DHT11_ADDR;
     XIic_Initialize(&iic_instance, IIC_ADDR);
-    XIic_Start(&iic_instance);
-    // uint8_t data_array[4];
     i2cLcd_Init();
+       
     lcdString("Humidity    : 00");
-    moveCursor(1, 0);
-    lcdString("Temperature : 00");
-
+    moveCursor(1, 0); 
+    lcdString("Temperature : 00");       
     char humidity_lcd[17];   
     char temperature_lcd[17];
 
     int humi;
     int tmpr;
-
-    while (1) {
+    
+    while(1){
         // printf("Humidity : %d\n", dht11_instance[0]);
         // printf("Temperature : %d\n", dht11_instance[1]);
+        sleep(4);
         humi = (int)dht11_instance[0];
         moveCursor(0, 14);
         lcdData(humi / 10 % 10 + '0');
@@ -163,7 +125,6 @@ int main()
         lcdData(tmpr / 10 % 10 + '0');
         lcdData(tmpr % 10 + '0');
     }
-
     cleanup_platform();
     return 0;
 }

@@ -866,7 +866,7 @@ module multifunction_watch_top_v2 (
     wire start_set;
     assign led[6] = start_set;
     // wire alarm; 출력으로 만들어야하기 때문에 wire는 부적절
-    cook_timer_ cook_timer_instance(
+    cook_timer cook_timer_instance(
         .clk(clk), 
         .reset_p(reset_p),
         .btn_mode(cook_btn[0]), 
