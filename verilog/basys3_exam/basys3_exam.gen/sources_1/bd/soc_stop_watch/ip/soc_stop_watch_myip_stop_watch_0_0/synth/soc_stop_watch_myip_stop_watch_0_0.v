@@ -48,7 +48,7 @@
 
 
 // IP VLNV: user.org:user:myip_stop_watch:1.0
-// IP Revision: 4
+// IP Revision: 7
 
 (* X_CORE_INFO = "myip_stop_watch,Vivado 2024.2" *)
 (* CHECK_LICENSE_TYPE = "soc_stop_watch_myip_stop_watch_0_0,myip_stop_watch,{}" *)

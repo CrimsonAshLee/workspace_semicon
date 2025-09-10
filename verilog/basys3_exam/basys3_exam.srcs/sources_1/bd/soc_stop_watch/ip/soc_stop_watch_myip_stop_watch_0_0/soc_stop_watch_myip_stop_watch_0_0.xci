@@ -4,7 +4,7 @@
     "xci_name": "soc_stop_watch_myip_stop_watch_0_0",
     "cell_name": "myip_stop_watch_0",
     "component_reference": "user.org:user:myip_stop_watch:1.0",
-    "ip_revision": "4",
+    "ip_revision": "7",
     "gen_directory": "../../../../../../basys3_exam.gen/sources_1/bd/soc_stop_watch/ip/soc_stop_watch_myip_stop_watch_0_0",
     "parameters": {
       "component_parameters": {
@@ -33,7 +33,7 @@
       },
       "runtime_parameters": {
         "IPCONTEXT": [ { "value": "IP_Integrator" } ],
-        "IPREVISION": [ { "value": "4" } ],
+        "IPREVISION": [ { "value": "7" } ],
         "MANAGED": [ { "value": "TRUE" } ],
         "OUTPUTDIR": [ { "value": "../../../../../../basys3_exam.gen/sources_1/bd/soc_stop_watch/ip/soc_stop_watch_myip_stop_watch_0_0" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],

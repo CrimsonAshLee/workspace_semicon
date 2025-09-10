@@ -1,6 +1,6 @@
-#line 1 "../platform_stopwatch/hw/sdt/system-top.dts"
+#line 1 "../platform_stopwatch_min/hw/sdt/system-top.dts"
 /dts-v1/;
-#line 1 "../platform_stopwatch/hw/sdt/pl.dtsi"
+#line 1 "../platform_stopwatch_min/hw/sdt/pl.dtsi"
 / {
 	cpus_microblaze_riscv_0: cpus_microblaze_riscv@0 {
 		#cpu-mask-cells = <1>;
@@ -310,7 +310,7 @@
 		};
 	};
 };
-#line 3 "../platform_stopwatch/hw/sdt/system-top.dts"
+#line 3 "../platform_stopwatch_min/hw/sdt/system-top.dts"
 / {
 	board = "basys3";
 	compatible = "xlnx,basys3";

@@ -1,33 +1,17 @@
-# 2025-09-09T16:24:29.394589
+# 2025-09-10T18:57:02.818791
 import vitis
 
 client = vitis.create_client()
 client.set_workspace(path="soc2024_2")
 
-platform = client.get_component(name="platform_btn_fnd")
+platform = client.get_component(name="platform_stopwatch_min")
 status = platform.build()
 
-comp = client.get_component(name="app_btn_fnd")
+comp = client.get_component(name="app_stopwatch_min")
 comp.build()
 
 status = platform.build()
 
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-platform = client.get_component(name="platform_stopwatch")
-status = platform.build()
-
-comp = client.get_component(name="app_stopwatch")
-comp.build()
-
-platform = client.get_component(name="platform_txtlcd")
-status = platform.build()
-
-comp = client.get_component(name="app_txtlcd")
 comp.build()
 
 vitis.dispose()
