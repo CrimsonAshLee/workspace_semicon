@@ -396,16 +396,96 @@ module mux_demux_test (
     
 endmodule
 
-module decoder_2_4 (
-    input [1:0] code,       // 2비트 입력 (00, 01, 10, 11)
-    output [3:0] signal    // 4비트 출력 (하나의 비트만 1이 됨)
+module encoder_4_2 (
+    input [3:0] signal,
+    // output reg [1:0] code    // behavioral 방식
+    output [1:0] code   // dataflow 방식
 );
 
-    // 삼항 연산자를 사용하여 디코더 논리를 구현
-    // 입력 'code'의 값에 따라 'signal'의 값을 결정
-    assign signal = (code == 2'b00) ? 4'b0001 : // code가 00일 때, signal의 가장 낮은 비트(0번)를 1로
-                    (code == 2'b01) ? 4'b0010 : // code가 01일 때, signal의 1번 비트를 1로
-                    (code == 2'b10) ? 4'b0100 : // code가 10일 때, signal의 2번 비트를 1로
-                    4'b1000;                    // 위의 모든 조건이 아니면 (code가 11일 때), signal의 가장 높은 비트(3번)를 1로
+    // dataflow
+    assign code = (signal == 4'b1000) ? 2'b11 :
+                  (signal == 4'b0100) ? 2'b10 :
+                  (signal == 4'b0010) ? 2'b01 : 2'b00;
+
+    // // behavioral
+    // always @(signal) begin
+    // // always @(signal) : 어떤 신호가 트리거인지 명확히 할 때
+    // // always @(*): 혹시 모를 실수를 방지하고 싶을 때
+    //     if (signal == 4'b1000) begin
+    //     // if (signal[3] == 1'b1) begin // '1000'이면 : 다른표현방식
+    //         code = 2'b11;
+    //     end
+    //     else if (signal == 4'b0100) begin
+    //         code = 2'b10;
+    //     end
+    //     else if (signal == 4'b0010) begin
+    //         code = 2'b01;
+    //     end
+            /* 아래의 else문의 2'b00 과 같으므로 지워야함
+            // else if (signall == 4'b0001) begin
+            //     code = 2'b00;
+            // end
+            */
+    //     else begin   // else 문을 써줌으로써 조합회로, 안쓴다면 래치 회로가 만들어짐
+    //         code = 2'b00; 
+    //     end
+    // end
+
+    // // behavioral
+    // always @(signal) begin
+    //     case (signal)
+    //         4'b0001: code = 2'b00;
+    //         4'b0010: code = 2'b01;
+    //         4'b0100: code = 2'b10;
+    //         4'b1000: code = 2'b11;
+    //         default: code = 2'b00;
+    //     endcase
+    // end
+        
+endmodule
+
+module decoder_2_4 (
+    input [1:0] code,       // 2비트 입력 (00, 01, 10, 11)
+    output reg [3:0] signal // behavioral
+    // output [3:0] signal    // 4비트 출력 (하나의 비트만 1이 됨) // dataflow
+);
+
+    // // 삼항 연산자를 사용하여 디코더 논리를 구현
+    // // 입력 'code'의 값에 따라 'signal'의 값을 결정
+    // // dataflow
+    // assign signal = (code == 2'b00) ? 4'b0001 : // code가 00일 때, signal의 가장 낮은 비트(0번)를 1로
+    //                 (code == 2'b01) ? 4'b0010 : // code가 01일 때, signal의 1번 비트를 1로
+    //                 (code == 2'b10) ? 4'b0100 : // code가 10일 때, signal의 2번 비트를 1로
+    //                 4'b1000;                    // 위의 모든 조건이 아니면 (code가 11일 때), signal의 가장 높은 비트(3번)를 1로
+
+    // // behavioral
+    // always @(code) begin
+    //     if (code == 2'b00) begin
+    //         signal = 4'b0001;
+    //     end
+    //     else if (code == 2'b01) begin
+    //         signal = 4'b0010;
+    //     end
+    //     else if (code == 2'b10) begin
+    //         signal = 4'b0100;
+    //     end
+    //     else if (code == 2'b11) begin
+    //         signal = 4'b1000;
+    //     end
+    //     else begin
+    //         signal = 4'b0000;
+    //     end
+    // end
+
+    // behavioral
+    always @(code) begin
+        case (code)
+            2'b00: signal = 4'b0001;
+            2'b01: signal = 4'b0010;
+            2'b10: signal = 4'b0100;
+            2'b11: signal = 4'b1000;
+            default: signal = 4'b0000;
+        endcase
+    end                
     
 endmodule

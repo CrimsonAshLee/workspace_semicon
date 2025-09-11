@@ -256,7 +256,7 @@ module decoder_2_4(
 //        else signal = 4'b0000;
 //      end
 
-    always @(signal) begin
+    always @(code) begin
         case (code)
             2'b00: signal = 4'b0001;
             2'b01: signal = 4'b0010;
