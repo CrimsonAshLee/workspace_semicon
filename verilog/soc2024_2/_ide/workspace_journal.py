@@ -1,4 +1,4 @@
-# 2025-09-12T17:25:11.936224
+# 2025-09-15T18:24:21.063989
 import vitis
 
 client = vitis.create_client()
@@ -10,10 +10,26 @@ status = platform.build()
 comp = client.get_component(name="app_btn_fnd")
 comp.build()
 
-platform = client.get_component(name="platform_pwm")
+platform = client.get_component(name="platform_stopwatch_intc")
 status = platform.build()
 
-comp = client.get_component(name="app_pwm")
+comp = client.get_component(name="app_stopwatch_intc")
+comp.build()
+
+platform = client.get_component(name="platform_stopwatch_min")
+status = platform.build()
+
+comp = client.get_component(name="app_stopwatch_min")
+comp.build()
+
+platform = client.get_component(name="platform_stopwatch_intc")
+status = platform.build()
+
+comp = client.get_component(name="app_stopwatch_intc")
+comp.build()
+
+status = platform.build()
+
 comp.build()
 
 vitis.dispose()

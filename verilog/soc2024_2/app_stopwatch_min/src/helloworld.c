@@ -117,8 +117,8 @@ int main()
     uint8_t btn_value;
     uint8_t btn_flag = 0;
     // uint8_t lap_cnt = 0;
-    while (1) {
-        btn_value = XGpio_DiscreteRead(&btn_instance, BTN_CHANNEL);
+    while (1) { // 버튼 인터럽트를 소프트웨어적으로 구현한것
+        btn_value = XGpio_DiscreteRead(&btn_instance, BTN_CHANNEL); // 버튼을 계속 읽는 비효율을 개선하기(intc ver)
 
         if (btn_value == 0) {
             btn_flag = 0;
