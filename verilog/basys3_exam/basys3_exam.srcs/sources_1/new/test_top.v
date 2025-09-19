@@ -1573,144 +1573,61 @@ module MQ2gas_top (
     
 endmodule
 
-module stepper_cntr(
+module pwm_custom(
     input clk, reset_p,
-    input [2:0] cntr_sig,             // 나중에 IP로 만들면 C 코딩할때 여기 레지스터로 값 받아서 제어  
-    output reg IN1, IN2, IN3, IN4     // 이거 그대로 XDC에 뽑아서 스텝모터랑 연결
-    );
+    input [27:0] duty,          // 1~100,000,000까지  듀티비 입력받을 레지스터
+    input [26:0] freq_div,      // 1~100,000,000까지 분주비 입력받을 레지스터
+    output reg pwm);
     
-    
-    // FSM 사용할 상태 선언
-    localparam IDLE     = 5'b00001;   
-    localparam S_0001   = 5'b00010;
-    localparam S_0010   = 5'b00100;
-    localparam S_0100   = 5'b01000;
-    localparam S_1000   = 5'b10000;
+    integer divFreq_cnt;        // 타겟 주파수 세는 변수
+    integer duty_cnt;           // 타겟 듀티비 세는 변수
+    wire target_freq_pedge;     // 라이징엣지 받아올 변수
+    reg target_freq;            // 타겟 주파수로 사용
     
     
     
-    // 시스템 클락 분주
-    reg delay_clk;                                  // C 코딩할때 딜레이 안넣으려고 모듈에서 미리 분주해줌
-    integer delay_time;                             // C 코딩할때 최대한 논블로킹 방식으로 하기 위함
+    // 타겟 주파수 생성하는 부분
     always @(posedge clk, posedge reset_p) begin
-        if(reset_p) begin
-            delay_time <= 0;
-            delay_clk <= 0;
+      if(reset_p) begin
+        target_freq <= 0;
+        divFreq_cnt <= 0;
+      end else begin
+        if(divFreq_cnt >= freq_div-1) begin         // 입력받은 분주비까지 카운팅 되면
+            divFreq_cnt <= 0;                       // 카운트 0으로 초기화
+            target_freq <= ~target_freq;            // 타겟 주파수 토글하면서 사각파 생성
         end else begin
-            if(delay_time >= 499_999) begin         // 5ms로 분주
-                delay_clk <= ~delay_clk;
-                delay_time <= 0;
-            end else begin
-                delay_time <= delay_time + 1;
-            end
-        end
+            divFreq_cnt <= divFreq_cnt + 2;         // 분주비까지 도달 못하면 계속 카운팅
+        end                                         // 매 클럭마다 카운팅, 클럭이 반파이기 때문에 분주비 그대로 받아서 작동하려면 +2로 두배 빠르게 세야 함
+      end  
     end
     
-    
-    // 엣지디텍터로 5ms로 분주한 클락 폴링엣지 잡아줌 
-    wire delay_clk_ne;     
-    edge_detector_p divclk_ed(
+    // 타겟 주파수 라이징엣지만 뽑아올거
+    edge_detector_p pwm_freqX128_ed(
         .clk(clk),
         .reset_p(reset_p),
-        .cp(delay_clk),
-        .n_edge(delay_clk_ne)
+        .cp(target_freq),
+        .p_edge(target_freq_pedge)
     );
     
     
-    // 분주된 클락 폴링엣지일때 상태 바꿔줄거임(분주한 주기만큼 딜레이 줄거임)
-    reg [4:0] state, next_state;
-    always @(negedge clk, posedge reset_p) begin
-        if(reset_p) begin
-            state <= IDLE;
-        end else begin
-            if(delay_clk_ne) begin
-                state <= next_state;
-            end
-        end
-    end
-    
-    
-    // 상태천이 부분
+    // 타겟 주파수에 맞게 듀티비 맞춰서 실제로 PWM 출력 해주는 부분
     always @(posedge clk, posedge reset_p) begin
-        if(reset_p) begin
-            IN1 <= 0;
-            IN2 <= 0;
-            IN3 <= 0;
-            IN4 <= 1;
-            next_state <= IDLE;
-        end else begin
-            case(state)
-                IDLE : begin                        // 입력 안들어올 때
-                    IN1 <= 0;
-                    IN2 <= 0;
-                    IN3 <= 0;
-                    IN4 <= 1;                               // 멈춰있을 때 0000 아니고 아무데나 1 줘야 가만히 있을때도 토크가 유지됨
-                    if(cntr_sig == 3'b001) begin            // 정지 신호(001) 들어오면 계속 상태 IDLE 유지
-                        next_state <= IDLE;
-                    end else if(cntr_sig == 3'b010) begin   // 시계방향 신호(010) 들어오면 다음 상태로 ㄱㄱ
-                        next_state <= S_0001;
-                    end else if(cntr_sig == 3'b100) begin   // 반시계방향 신호(100) 들어오면 다음 상태로 ㄱㄱ
-                        next_state <= S_0001;
-                    end
-                end
-                
-                S_0001 : begin
-                    IN1 <= 0;       // 0001 상태에 맞게 출력 0001로 줌
-                    IN2 <= 0;
-                    IN3 <= 0;
-                    IN4 <= 1;
-                    if(cntr_sig == 3'b001) begin
-                        next_state <= IDLE;
-                    end else if(cntr_sig == 3'b010) begin   // 시계방향 신호면 출력 0001 상태에서 0010 상태로 ㄱㄱ
-                        next_state <= S_0010;
-                    end else if(cntr_sig == 3'b100) begin   // 반시계방향 신호면 1000 상태로 ㄱㄱ
-                        next_state <= S_1000;
-                    end
-                end
-                
-                S_0010 : begin
-                    IN1 <= 0;   // 0010 상태에 맞게 출력 0010으로 줌
-                    IN2 <= 0;
-                    IN3 <= 1;
-                    IN4 <= 0;
-                    if(cntr_sig == 3'b001) begin
-                        next_state <= IDLE;
-                    end else if(cntr_sig == 3'b010) begin   // 시계방향 신호면 0100 상태로 ㄱㄱ
-                        next_state <= S_0100;
-                    end else if(cntr_sig == 3'b100) begin   // 반시계방향 신호면 0001 상태로 ㄱㄱ
-                        next_state <= S_0001;
-                    end
-                end
-                
-                S_0100 : begin
-                    IN1 <= 0;   // 0100 상태에 맞게 출력 0100으로 줌
-                    IN2 <= 1;
-                    IN3 <= 0;
-                    IN4 <= 0;
-                    if(cntr_sig == 3'b001) begin
-                        next_state <= IDLE;
-                    end else if(cntr_sig == 3'b010) begin   // 시계방향 신호면 1000 상태로 ㄱㄱ 
-                        next_state <= S_1000;
-                    end else if(cntr_sig == 3'b100) begin   // 반시계방향 신호면 0010 상태로 ㄱㄱ
-                        next_state <= S_0010;
-                    end
-                end
-                
-                S_1000 : begin
-                    IN1 <= 1;   // 1000 상태에 맞게 출력 1000으로 줌
-                    IN2 <= 0;
-                    IN3 <= 0;
-                    IN4 <= 0;
-                    if(cntr_sig == 3'b001) begin
-                        next_state <= IDLE;
-                    end else if(cntr_sig == 3'b010) begin   // 시계방향 신호면 0001 상태로 ㄱㄱ
-                        next_state <= S_0001;
-                    end else if(cntr_sig == 3'b100) begin   // 반시계방향 신호면 0100 상태로 ㄱㄱ
-                        next_state <= S_0100;
-                    end
-                end
-            endcase
-        end
+      if(reset_p) begin
+          duty_cnt <= 0;
+          pwm <= 0;
+      end else begin
+          if(target_freq_pedge) begin           // 타켓 주파수의 라이징엣지일 때 일단 출력 High로 올림
+              pwm <= 1;                         // 이때부터 카운팅 시작해서 주파수는 타겟 주파수 그대로 유지하는데
+              duty_cnt <= 0;                    // 듀티비를 어느정도 할지(high를 얼마나 길게 유지할지) 정함
+          end else begin
+              if(duty_cnt >= duty-1) begin      // 입력받은 듀티비 값까지 다 세면
+                  pwm <= 0;                     // 출력을 LOW로 떨궈줌
+                  duty_cnt <= 0;                // 카운트 0으로 초기화
+              end else begin
+                duty_cnt <= duty_cnt + 1;       // 입력 듀티비까지 도달 못하면 계속 카운팅
+              end                               // 얘도 똑같이 반파임, 근데 분주비와 듀티비를 입력할 때 두 수가 같아야
+          end                                   // 직관적으로 봤을때 100%의 듀티비가 되기 때문에 얘는 +1씩 카운팅
+      end
     end
     
 endmodule
