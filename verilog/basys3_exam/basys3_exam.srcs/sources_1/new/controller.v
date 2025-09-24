@@ -1281,33 +1281,38 @@ int main()
 }
 */
 
-module top_level_7seg(
+module seg_cntr(
     input clk,
     input reset_p,
-    input [7:0] sw, // 8개의 스위치 입력
+    input [3:0] control, // 4개의 스위치 입력
     output srclk,
     output rclk,
     output ser
 );
-    
-    wire [7:0] seg_data;
 
     reg [7:0] data_out;
-    always @(*) begin
-        case(sw)
-            4'b0001: data_out = 8'b00000110; // '1' (dp, g, f, e, d, c, b, a)
-            4'b0010: data_out = 8'b01011011; // '2'
-            4'b0011: data_out = 8'b01001111; // '3'
-            4'b0100: data_out = 8'b01100110; // '4'
-            4'b0101: data_out = 8'b01101101; // '5'
-            4'b0110: data_out = 8'b01111101; // '6'
-            4'b0111: data_out = 8'b00000111; // '7'
-            4'b1000: data_out = 8'b01111111; // '8'
-            4'b1001: data_out = 8'b01100111; // '9'
-            4'b0000: data_out = 8'b00111111; // '0'
-            4'b1010: data_out = 8'b10000000; // 'dp'
-            default: data_out = 8'b00000000; // 모든 스위치 OFF일 때
-        endcase
+    always @(posedge clk, posedge reset_p) begin
+        
+        if (reset_p) begin
+            data_out <= 8'b0000_0000;
+        end
+        else begin
+            case(control)
+                4'b0001: data_out = 8'b0000_0110; // '1' (dp, g, f, e, d, c, b, a)
+                4'b0010: data_out = 8'b0101_1011; // '2'
+                4'b0011: data_out = 8'b0100_1111; // '3'
+                4'b0100: data_out = 8'b0110_0110; // '4'
+                4'b0101: data_out = 8'b0110_1101; // '5'
+                4'b0110: data_out = 8'b0111_1101; // '6'
+                4'b0111: data_out = 8'b0000_0111; // '7'
+                4'b1000: data_out = 8'b0111_1111; // '8'
+                4'b1001: data_out = 8'b0110_0111; // '9'
+                4'b0000: data_out = 8'b0011_1111; // '0'
+                4'b1010: data_out = 8'b1000_0000; // 'dp'
+                default: data_out = 8'b0000_0000; // 모든 스위치 OFF일 때
+            endcase
+        end
+    
     end
 
     sn74hc595_cntr sn595_inst (
