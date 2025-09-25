@@ -178,7 +178,7 @@ module sn74hc595_cntr(
     
 endmodule
 
-module seg_cntr(
+module seg_cntr_v1(
     input clk,
     input reset_p,
     input [3:0] control, // 4개의 스위치 입력
@@ -213,6 +213,67 @@ module seg_cntr(
     end
 
     sn74hc595_cntr sn595_inst (
+        .clk(clk),
+        .reset_p(reset_p),
+        .data_in(data_out),
+        .srclk(srclk),
+        .rclk(rclk),
+        .ser(ser)
+    );
+
+endmodule
+
+module seg_cntr(
+    input clk,
+    input reset_p,
+    input common_mode,       // 하드웨어 애노드 캐소드 공통 바꿀 필요 없이 다 쓸수있게 할거
+    input [3:0] control,
+    output srclk,
+    output rclk,
+    output ser
+);
+
+    reg [7:0] data_out;
+    always @(posedge clk, posedge reset_p) begin
+    
+        if(reset_p) begin
+            data_out <= 8'b0000_0000;
+        end else begin
+            if(common_mode) begin                     // 캐소드 공통일때(1줘야 켜지는 애들)
+                case(control)
+                    4'b0001: data_out = 8'b0000_0110; // '1' (dp, g, f, e, d, c, b, a)
+                    4'b0010: data_out = 8'b0101_1011; // '2'
+                    4'b0011: data_out = 8'b0100_1111; // '3'
+                    4'b0100: data_out = 8'b0110_0110; // '4'
+                    4'b0101: data_out = 8'b0110_1101; // '5'
+                    4'b0110: data_out = 8'b0111_1101; // '6'
+                    4'b0111: data_out = 8'b0000_0111; // '7'
+                    4'b1000: data_out = 8'b0111_1111; // '8'
+                    4'b1001: data_out = 8'b0110_0111; // '9'
+                    4'b0000: data_out = 8'b0011_1111; // '0'
+                    4'b1010: data_out = 8'b1000_0000; // 'dp'
+                    default: data_out = 8'b0000_0000; // 모든 스위치 OFF일 때
+                endcase
+            end else begin                            // 애노드 공통일때(0줘야 켜지는 애들)
+                case(control)
+                    4'b0001: data_out = ~(8'b0000_0110); // '1' (dp, g, f, e, d, c, b, a)
+                    4'b0010: data_out = ~(8'b0101_1011); // '2'
+                    4'b0011: data_out = ~(8'b0100_1111); // '3'
+                    4'b0100: data_out = ~(8'b0110_0110); // '4'
+                    4'b0101: data_out = ~(8'b0110_1101); // '5'
+                    4'b0110: data_out = ~(8'b0111_1101); // '6'
+                    4'b0111: data_out = ~(8'b0000_0111); // '7'
+                    4'b1000: data_out = ~(8'b0111_1111); // '8'
+                    4'b1001: data_out = ~(8'b0110_0111); // '9'
+                    4'b0000: data_out = ~(8'b0011_1111); // '0'
+                    4'b1010: data_out = ~(8'b1000_0000); // 'dp'
+                    default: data_out = ~(8'b0000_0000); // 모든 스위치 OFF일 때
+                endcase            
+            end   
+        end
+    end
+
+    sn74hc595_cntr sr_seg (
         .clk(clk),
         .reset_p(reset_p),
         .data_in(data_out),
@@ -365,7 +426,7 @@ module stepper_cntr(
     
 endmodule
 
-module button_cntr(
+module button_cntr_v1(
     input clk, reset_p,
     input [4:0] btn,
     output [4:0] btn_trig_pe,
@@ -405,7 +466,95 @@ module button_cntr(
     
 endmodule
 
-module photo_INT_cntr(
+module button_cntr(
+    input clk, reset_p,
+    input [4:0] btn,
+    input active_mode,          // 하드웨어 액티브 모드 수정해서 쓸 필요 없게 할거
+    output reg [4:0] btn_out
+    );
+    
+
+    wire [4:0] debounced_btn;
+    debounce db_btn_0( clk, btn[0], debounced_btn[0] );
+    debounce db_btn_1( clk, btn[1], debounced_btn[1] );
+    debounce db_btn_2( clk, btn[2], debounced_btn[2] );
+    debounce db_btn_3( clk, btn[3], debounced_btn[3] );
+    debounce db_btn_4( clk, btn[4], debounced_btn[4] );
+    
+    always @(posedge clk, posedge reset_p) begin
+        if(reset_p) begin
+            btn_out <= 0;
+        end else begin
+            if(active_mode) begin                   // 액티브 하이로 설정해 두면
+                if(debounced_btn[0]) begin          // 하드웨어에서 high 신호 들어올 때 레지스터에 1 저장할거
+                    btn_out[0] <= 1;
+                end else begin
+                    btn_out[0] <= 0;
+                end
+                
+                if(debounced_btn[1]) begin
+                    btn_out[1] <= 1;
+                end else begin
+                    btn_out[1] <= 0;
+                end
+                
+                if(debounced_btn[2]) begin
+                    btn_out[2] <= 1;
+                end else begin
+                    btn_out[2] <= 0;
+                end
+                
+                if(debounced_btn[3]) begin
+                    btn_out[3] <= 1;
+                end else begin
+                    btn_out[3] <= 0;
+                end
+                
+                if(debounced_btn[4]) begin
+                    btn_out[4] <= 1;
+                end else begin
+                    btn_out[4] <= 0;
+                end
+                
+            end else begin
+            
+                if(~debounced_btn[0]) begin         // 액티브 로우로 설정해 두면                
+                    btn_out[0] <= 1;                // 반대로 하드웨어에서 low 신호 들어올 때 1 저장할거
+                end else begin
+                    btn_out[0] <= 0;
+                end
+                
+                if(~debounced_btn[1]) begin
+                    btn_out[1] <= 1;
+                end else begin
+                    btn_out[1] <= 0;
+                end
+                
+                if(~debounced_btn[2]) begin
+                    btn_out[2] <= 1;
+                end else begin
+                    btn_out[2] <= 0;
+                end
+                
+                if(~debounced_btn[3]) begin
+                    btn_out[3] <= 1;
+                end else begin
+                    btn_out[3] <= 0;
+                end
+                
+                if(~debounced_btn[4]) begin
+                    btn_out[4] <= 1;
+                end else begin
+                    btn_out[4] <= 0;
+                end
+            end        
+        end
+
+    end
+    
+endmodule
+
+module photo_INT_cntr_v1(
     input clk, reset_p,
     input [2:0] photo_INT,
     output [2:0] INT_trig_pe,INT_trig_ne
@@ -429,6 +578,58 @@ module photo_INT_cntr(
 //            end
 //        end
 //    end
+    
+endmodule
+
+module photo_INT_cntr(
+    input clk, reset_p,
+    input [2:0] photo_INT,
+    input active_mode,              // 하드웨어 액티브 모드 수정해서 쓸 필요 없게 할거
+    output reg [2:0] signal_out
+    );
+    
+    always @(posedge clk, posedge reset_p) begin
+        if(reset_p) begin
+            signal_out <= 0;
+        end else begin
+            if(active_mode) begin           // 액티브 하이로 설정해 두면
+                if(photo_INT[0]) begin      // 하드웨어에서 high 신호 들어올 때 레지스터에 1 저장할거
+                    signal_out[0] <= 1;
+                end else begin
+                    signal_out[0] <= 0;
+                end
+                
+                if(photo_INT[1]) begin
+                    signal_out[1] <= 1;
+                end else begin
+                    signal_out[1] <= 0;
+                end
+                if(photo_INT[2]) begin
+                    signal_out[2] <= 1;
+                end else begin
+                    signal_out[2] <= 0;
+                end
+            end else begin                 // 액티브 로우로 설정해 두면
+                if(~photo_INT[0]) begin    // 반대로 하드웨어에서 low 신호 들어올 때 1 저장할거
+                    signal_out[0] <= 1;
+                end else begin
+                    signal_out[0] <= 0;
+                end
+                
+                if(~photo_INT[1]) begin
+                    signal_out[1] <= 1;
+                end else begin
+                    signal_out[1] <= 0;
+                end
+                
+                if(~photo_INT[2]) begin
+                    signal_out[2] <= 1;
+                end else begin
+                    signal_out[2] <= 0;
+                end
+            end
+        end
+    end
     
 endmodule
 
