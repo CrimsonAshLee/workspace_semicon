@@ -31,5 +31,13 @@ module ImmGen(
     assign I = {{20{inst_Imm[24]}}, inst_Imm[24 -: 12]};  // 24번 비트부터 12비트
     assign B = {{19{inst_Imm[24]}}, inst_Imm[24], inst_Imm[0], inst_Imm[23 -: 6], inst_Imm[4:1], 1'b0}; // 23번부터 6개
     assign U = {inst_Imm[24 -: 20], 12'b0};
+    assign J = {{11{inst_Imm[24]}}, inst_Imm[24], inst_Imm[12:5], inst_Imm[13], inst_Imm[23-:10], 1'b0};
+    assign S = {{20{inst_Imm[24]}}, inst_Imm[24-:7], inst_Imm[4:0]};
+    
+    assign Imm = (ImmSel == 0) ? I :
+                 (ImmSel == 1) ? B :
+                 (ImmSel == 2) ? U :
+                 (ImmSel == 3) ? J :
+                 (ImmSel == 4) ? S : 0; // 뭐가 나와도 DON`T CARE라서 그냥 0 출력 시킴
     
 endmodule
