@@ -43,6 +43,7 @@ module riscV32I(
     
     wire [31:0] DataA, DataB;
     wire [31:0] WB;
+    
     wire RegEn;
     registerFile REGFILE(
         .RD1(DataA), .RD2(DataB),     // 출력이 ALU의 A,B로 들어감 
@@ -52,18 +53,37 @@ module riscV32I(
     );
     
     wire [31:0] A, B, ALU_o;
+    wire [31:0] ALU_B;
+    assign ALU_B = BSel ? B : Imm;
     wire [3:0] ALUSel;
     ALU(
-        .A(A), .B(B),
+        .A(A), .B(ALU_B),
         .ALU_o(ALU_o),
         .ALUSel(ALUSel)
     );
     
     wire [2:0] ImmSel;
+    wire BSel, WBSel;
     control CNTR(
         .instruction(instruction),
         .ALUSel(ALUSel),
-        .ImmSel(ImmSel)
+        .ImmSel(ImmSel),
+        .BSel(BSel), WBSel(WBSel)
     );
     
+    wire [31:0] Imm;
+    ImmGen immgen(
+        .ImmSel(ImmSel),
+        .inst_Imm(instruction[31:7]),
+        .Imm(Imm)
+    );
+    
+    wire [31:0] DMEM;
+    wire MemRW;
+    data_mem DATAMEM(
+        .ReadData(DMEM),
+        .ADDR(ALU_o), .WriteData(DataB),
+        .clk(clk), .MemWrite(MemRW)
+    );
+    assign WB = (WBSel == 1) ? ALU_o : DMEM;
 endmodule
