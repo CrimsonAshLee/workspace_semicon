@@ -32,10 +32,10 @@ module data_mem(
     
     always @(posedge clk)begin
         if(MemWrite)begin
-            MEM_Data[ADDR+3]   = WriteData[31:24];
+            MEM_Data[ADDR+3] = WriteData[31:24];
             MEM_Data[ADDR+2] = WriteData[23:16];
             MEM_Data[ADDR+1] = WriteData[15:8];
-            MEM_Data[ADDR] = WriteData[7:0];
+            MEM_Data[ADDR]   = WriteData[7:0];
         end
     end
     

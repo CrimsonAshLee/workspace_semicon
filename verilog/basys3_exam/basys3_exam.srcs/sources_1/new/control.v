@@ -23,7 +23,8 @@
 module control(
     input [31:0] instruction,
     output [3:0] ALUSel,
-    output [2:0] ImmSel,     // I : 0, B : 1, U : 2, J : 3, S : 4
+    output [2:0] ImmSel,      // I : 0, B : 1, U : 2, J : 3, S : 4
+    output [2:0] WordSizeSel,      // Byte : 0, Half Word : 1, Word : 2
     output BSel, MemRW
     );
     
@@ -49,5 +50,9 @@ module control(
                     (S_cond == 1) ? 4 : 5;
                     
    assign WBSel = (inst_opcode[4:0] == 5'b00000) ? 0 : 1;
+   
+   
+   assign WordSizeSel = inst_opcode[7:5];
+   
     
 endmodule
