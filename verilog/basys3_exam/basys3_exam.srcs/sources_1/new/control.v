@@ -22,10 +22,12 @@
 
 module control(
     input [31:0] instruction,
+    input BrEq, BrLT,
     output [3:0] ALUSel,
     output [2:0] ImmSel,      // I : 0, B : 1, U : 2, J : 3, S : 4
     output [2:0] WordSizeSel,      // Byte : 0, Half Word : 1, Word : 2
-    output BSel, MemRW
+    output BSel, MemRW, BrUn, 
+    output [1:0] WBSel, PCSel
     );
     
     wire I_cond, B_cond, U_cond, J_cond, S_cond, R_cond;
@@ -49,10 +51,18 @@ module control(
                     (J_cond == 1) ? 3 :
                     (S_cond == 1) ? 4 : 5;
                     
-   assign WBSel = (inst_opcode[4:0] == 5'b00000) ? 0 : 1;
+   assign WBSel = J_cond ? 2 : ((inst_opcode[4:0] == 5'b00000) ? 0 : 1);
    
    
    assign WordSizeSel = inst_opcode[7:5];
-   
-    
+   assign BrUn = inst_opcode[6];
+   assign PCSel = (inst_opcode[4:0] == 5'b11001) ? 2 : 
+                  ((B_cond & BrEq & (inst_opcode[7:5] == 3'b000)) |
+                  (B_cond & ~BrEq & (inst_opcode[7:5] == 3'b001)) |
+                  (B_cond & BrLT & (inst_opcode[7:5] == 3'b100))  |
+                  (B_cond & ~BrLT & (inst_opcode[7:5] == 3'b101)) |
+                  (B_cond & BrLT & (inst_opcode[7:5] == 3'b110))  |
+                  (B_cond & ~BrLT & (inst_opcode[7:5] == 3'b111)) |
+                  J_cond) ? 1: 0 ;
+                  
 endmodule

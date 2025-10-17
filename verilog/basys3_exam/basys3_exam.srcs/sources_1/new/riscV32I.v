@@ -26,8 +26,15 @@ module riscV32I(
     
     reg [6:0] PC;
     wire [6:0] PC_NEXT;
+    wire [1:0] PCSel;
+    wire [31:0] Imm;
+    wire BSel;
+    wire [1:0] WBsel;
+    wire BrEq, BrLT, BrUn;
+    wire [31:0] ALU_o;
     
-    assign PC_NEXT = PC + 1;
+    assign PC_NEXT = (PCSel == 2) ? ALU_o : 
+                     (PCSel == 1) ? Imm : (PC + 1);
     
     always @(posedge clk, posedge reset_p) begin
         if(reset_p)PC = 0;
@@ -52,26 +59,26 @@ module riscV32I(
         .RegWrite(RegEn), .clk(clk), .reset_p(reset_p)
     );
     
-    wire [31:0] A, B, ALU_o;
     wire [31:0] ALU_B;
-    assign ALU_B = BSel ? B : Imm;
+    assign ALU_B = BSel ? DataB : Imm;
     wire [3:0] ALUSel;
     ALU ALU(
-        .A(A), .B(ALU_B),
+        .A(DataA), .B(ALU_B),
         .ALU_o(ALU_o),
         .ALUSel(ALUSel)
     );
     
     wire [2:0] ImmSel, WordSizeSel;
-    wire BSel, WBSel;
+    
     control CNTR(
         .instruction(instruction),
+        .BrEq(BrEq), .BrLT(BrLT),
         .ALUSel(ALUSel),
         .ImmSel(ImmSel),
-        .BSel(BSel), .WBSel(WBSel),
+        .BSel(BSel), .WBSel(WBSel), .BrUn(BrUn), .PCSel(PCSel),
         .WordSizeSel(WordSizeSel)
     );
-    wire [31:0] Imm;
+    
     ImmGen immgen(
         .ImmSel(ImmSel),
         .inst_Imm(instruction[31:7]),
@@ -84,13 +91,13 @@ module riscV32I(
         .ADDR(ALU_o), .WriteData(DataB),
         .clk(clk), .MemWrite(MemRW)
     );
-    assign WB = (WBSel == 1) ? ALU_o : DMEM;
+    assign WB = (WBSel == 2) ? (PC + 1) : (WBSel == 1) ? ALU_o : DMEM;
     assign WB_Byte = WordSizeSel[2] ? {24'b0, WB[7:0]} : {{24{WB[7]}}, WB[7:0]};
     assign WB_Half = WordSizeSel[2] ? {16'b0, WB[15:0]} : {{16{WB[15]}}, WB[15:0]};
     assign WB_cut = (WordSizeSel[1:0] == 0) ? WB_Byte :
                     (WordSizeSel[1:0] == 1) ? WB_Half : WB;
           
-    wire BrEq, BrLT, BrUn;              
+                  
     BranchComp BrComp(
         .BrEq(BrEq), .BrLT(BrLT),      // Eq = 1이면 같은거고 LT가 1이면 작은거이다. 둘다 1일순 없으나 0은 될 수있음.(크다)
         .RD1(DataA), .RD2(DataB),
